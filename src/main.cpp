@@ -18,20 +18,23 @@ const byte maxLines = 30;
 
 void drawScrollbar(unsigned long startFilePos, unsigned long endFilePos, unsigned long fileSize) {
   Serial.println("Drawing scrollbar");
-  Paint_DrawRectangle(EPD_4IN2_HEIGHT - 3, 1, 
-                      EPD_4IN2_HEIGHT, EPD_4IN2_WIDTH, 
+  Paint_DrawRectangle(EPD_4IN2_HEIGHT - 3, 1,
+                      EPD_4IN2_HEIGHT - 1, EPD_4IN2_WIDTH - 1, 
                       BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
-  unsigned int startY = map(startFilePos, 0, fileSize, 2, EPD_4IN2_WIDTH - 2);
-  unsigned int endY = map(endFilePos, 0, fileSize, 2, EPD_4IN2_WIDTH - 2);
-  if (startY == endY) {
-    endY ++;
+  unsigned int startY, endY;
+  if (fileSize == 0) {
+    startY = 2;
+    endY = EPD_4IN2_WIDTH - 1;
+  } else {
+    startY = map(startFilePos, 0, fileSize, 2, EPD_4IN2_WIDTH - 2);
+    endY = map(endFilePos, 0, fileSize, 2, EPD_4IN2_WIDTH - 2) + 1;
   }
   Serial.print("Drawing from "); 
   Serial.print(startY);
   Serial.print(" to ");
   Serial.println(endY);
   Paint_DrawRectangle(EPD_4IN2_HEIGHT - 2, startY,
-                      EPD_4IN2_HEIGHT, endY,
+                      EPD_4IN2_HEIGHT - 1, endY,
                       BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
 }
 
