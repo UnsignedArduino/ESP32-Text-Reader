@@ -10,22 +10,29 @@ File file;
 unsigned long filePos = 0;
 unsigned long nextFilePos = 0;
 
+unsigned long fileSize = 0;
+unsigned long bytesOnScreen = 0;
+
 const byte maxCharPerLine = 42;
 const byte maxLines = 30;
 
 unsigned long printFromLocation() {
   Paint_Clear(WHITE);
 
+  unsigned long startFilePos = file.position();
+
   Serial.print("Reading from location ");
-  Serial.println(file.position());
+  Serial.println(startFilePos);
 
   Serial.println("Loading from file");
+  bytesOnScreen = 0;
   // Serial.println("Got: ");
   for (unsigned int yPos = 0; yPos < EPD_4IN2_WIDTH; yPos += 13) {
     char line[maxCharPerLine + 1] = "";
     byte i = 0;
     for ( ; i < maxCharPerLine; i ++) {
       int nextByte = file.read();
+      bytesOnScreen ++;
       if (nextByte == -1) {
         break;
       }
@@ -34,6 +41,7 @@ unsigned long printFromLocation() {
         break;
       } else if (ch == '\r') {  // \r\n
         file.read();  // Advance forward one more because we still have \n to consume
+        bytesOnScreen ++;
         break;
       } else {
         line[i] = ch;
@@ -45,11 +53,16 @@ unsigned long printFromLocation() {
     Paint_DrawString_EN(0, yPos, line, &Font12, WHITE, BLACK);
   }
 
-  Serial.println("Showing contents");
-  EPD_4IN2_Display(imageBuffer);
+  unsigned long endFilePos = file.position();
 
   Serial.print("Ended at position: "); 
-  Serial.println(file.position());
+  Serial.println(endFilePos);
+
+  Serial.print("Bytes on screen: ");
+  Serial.println(bytesOnScreen);
+
+  Serial.println("Showing contents");
+  EPD_4IN2_Display(imageBuffer);
 
   return file.position();
 }
@@ -77,6 +90,8 @@ unsigned long findLastPageLocation() {
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
+  working();
+
   Serial.begin(9600);
   Serial.println();
 
@@ -96,9 +111,16 @@ void setup() {
     blinkError(500, 1000);
   }
   
+  fileSize = file.size();
+  Serial.print("File size: ");
+  Serial.print(fileSize);
+  Serial.println(" bytes");
+
   filePos = 0;
   file.seek(filePos);
   nextFilePos = printFromLocation();
+
+  notWorking();
 }
 
 void loop() {
