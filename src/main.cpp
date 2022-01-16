@@ -2,6 +2,7 @@
 #include <SD.h>
 #include "utils.h"
 #include "sdUtils.h"
+#include "epaperUtils.h"
 #include "pinouts.h"
 
 void setup() {
@@ -11,6 +12,9 @@ void setup() {
 
   if (beginSD(sdCS) != 0) {
     blinkError(100, 400);
+  }
+  if (beginEPaper() != 0) {
+    blinkError(250, 250);
   }
 }
 
