@@ -8,18 +8,19 @@
 
 File file;
 unsigned long filePos = 0;
+unsigned long nextFilePos = 0;
 
 const byte maxCharPerLine = 42;
 const byte maxLines = 30;
 
-void printFromLocation() {
+unsigned long printFromLocation() {
   Paint_Clear(WHITE);
 
   Serial.print("Reading from location ");
   Serial.println(file.position());
 
   Serial.println("Loading from file");
-  Serial.println("Got: ");
+  // Serial.println("Got: ");
   for (unsigned int yPos = 0; yPos < EPD_4IN2_WIDTH; yPos += 13) {
     char line[maxCharPerLine + 1] = "";
     byte i = 0;
@@ -39,13 +40,39 @@ void printFromLocation() {
       }
     }
     line[i] = '\0';
-    Serial.println(line);
+    // Serial.println(line);
 
     Paint_DrawString_EN(0, yPos, line, &Font12, WHITE, BLACK);
   }
 
   Serial.println("Showing contents");
   EPD_4IN2_Display(imageBuffer);
+
+  Serial.print("Ended at position: "); 
+  Serial.println(file.position());
+
+  return file.position();
+}
+
+unsigned long findLastPageLocation() {
+  Serial.print("Back tracking from location ");
+  Serial.println(file.position());
+  for (byte row = 0; row < maxLines * 2; row ++) {
+    for (byte col = 0; col < maxCharPerLine; col ++) {
+      if (!seekRelative(file, -1) || file.position() == 0) {
+        return 0;
+      }
+      if (peekBefore(file) == '\n') {
+        if (peekAtRelative(file, -2) == '\r') {
+          seekRelative(file, -2);
+        }
+        break;
+      }
+    }
+  }
+  Serial.print("New file position: ");
+  Serial.println(file.position());
+  return file.position();
 }
 
 void setup() {
@@ -71,10 +98,16 @@ void setup() {
   
   filePos = 0;
   file.seek(filePos);
-  printFromLocation();
-  file.close();
+  nextFilePos = printFromLocation();
 }
 
 void loop() {
-  
+  if (readRightButton()) {
+    file.seek(nextFilePos);
+    nextFilePos = printFromLocation();
+  }
+  if (readLeftButton()) {
+    file.seek(findLastPageLocation());
+    nextFilePos = printFromLocation();
+  }
 }
