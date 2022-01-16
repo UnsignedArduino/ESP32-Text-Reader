@@ -125,10 +125,10 @@ void setup() {
 
   beginButtons();
 
-  Serial.println("Opening /bible.txt");
-  file = SD.open("/bible.txt", FILE_READ);
+  Serial.println("Opening /text.txt");
+  file = SD.open("/text.txt", FILE_READ);
   if (!file) {
-    Serial.println("Unable to open /bible.txt");
+    Serial.println("Unable to open /text.txt");
     blinkError(500, 1000);
   }
   
