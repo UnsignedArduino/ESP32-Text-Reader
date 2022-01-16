@@ -16,6 +16,25 @@ unsigned long bytesOnScreen = 0;
 const byte maxCharPerLine = 42;
 const byte maxLines = 30;
 
+void drawScrollbar(unsigned long startFilePos, unsigned long endFilePos, unsigned long fileSize) {
+  Serial.println("Drawing scrollbar");
+  Paint_DrawRectangle(EPD_4IN2_HEIGHT - 3, 1, 
+                      EPD_4IN2_HEIGHT, EPD_4IN2_WIDTH, 
+                      BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
+  unsigned int startY = map(startFilePos, 0, fileSize, 2, EPD_4IN2_WIDTH - 2);
+  unsigned int endY = map(endFilePos, 0, fileSize, 2, EPD_4IN2_WIDTH - 2);
+  if (startY == endY) {
+    endY ++;
+  }
+  Serial.print("Drawing from "); 
+  Serial.print(startY);
+  Serial.print(" to ");
+  Serial.println(endY);
+  Paint_DrawRectangle(EPD_4IN2_HEIGHT - 2, startY,
+                      EPD_4IN2_HEIGHT, endY,
+                      BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+}
+
 unsigned long printFromLocation() {
   Paint_Clear(WHITE);
 
@@ -60,6 +79,8 @@ unsigned long printFromLocation() {
 
   Serial.print("Bytes on screen: ");
   Serial.println(bytesOnScreen);
+
+  drawScrollbar(startFilePos, endFilePos, fileSize);
 
   Serial.println("Showing contents");
   EPD_4IN2_Display(imageBuffer);
