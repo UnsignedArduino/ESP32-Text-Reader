@@ -1,9 +1,10 @@
 #include <Arduino.h>
 #include <SD.h>
+#include "pinouts.h"
 
-int beginSD(byte chipSelect) {
+int beginSD() {
   Serial.println("Initializing SD card...");
-  if (!SD.begin(chipSelect)) {
+  if (!SD.begin(sdCS)) {
     Serial.println("Error initializing SD card!");
     return 1;
   }
