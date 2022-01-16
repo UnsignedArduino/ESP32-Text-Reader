@@ -57,7 +57,7 @@ unsigned long printFromLocation() {
 unsigned long findLastPageLocation() {
   Serial.print("Back tracking from location ");
   Serial.println(file.position());
-  for (byte row = 0; row < maxLines * 2; row ++) {
+  for (byte row = 0; row < maxLines; row ++) {
     for (byte col = 0; col < maxCharPerLine; col ++) {
       if (!seekRelative(file, -1) || file.position() == 0) {
         return 0;
@@ -103,11 +103,16 @@ void setup() {
 
 void loop() {
   if (readRightButton()) {
+    working();
     file.seek(nextFilePos);
     nextFilePos = printFromLocation();
+    notWorking();
   }
   if (readLeftButton()) {
+    working();
+    file.seek(findLastPageLocation());
     file.seek(findLastPageLocation());
     nextFilePos = printFromLocation();
+    notWorking();
   }
 }
