@@ -3,6 +3,7 @@
 #include "utils.h"
 #include "sdUtils.h"
 #include "epaperUtils.h"
+#include <GUI_Paint.h>
 #include "buttonUtils.h"
 
 void setup() {
@@ -18,6 +19,9 @@ void setup() {
   }
 
   beginButtons();
+
+  Paint_DrawString_EN(0, 0, "`1234567890-=qwertyuiop[]\\asdfghjkl;'zxcvbnm,./~!@#$%^&*()_+QWERTYUIOP{}|ASDFGHJKL:\"ZXCVBNM<>?", &Font12, WHITE, BLACK);
+  EPD_4IN2_Display(imageBuffer);
 }
 
 void loop() {
