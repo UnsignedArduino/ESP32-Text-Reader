@@ -90,23 +90,10 @@ unsigned long printFromLocation() {
   return file.position();
 }
 
-unsigned long findLastPageLocation() {
+unsigned long findLastPageLocation(unsigned int pages) {
   Serial.print("Back tracking from location ");
   Serial.println(file.position());
-  // for (byte row = 0; row < maxLines; row ++) {
-  //   for (byte col = 0; col < maxCharPerLine; col ++) {
-  //     if (!seekRelative(file, -1) || file.position() == 0) {
-  //       return 0;
-  //     }
-  //     if (peekBefore(file) == '\n') {
-  //       if (peekAtRelative(file, -2) == '\r') {
-  //         seekRelative(file, -2);
-  //       }
-  //       break;
-  //     }
-  //   }
-  // }
-  for (byte row = 0; row < maxLines; row ++) {
+  for (byte row = 0; row < pages; row ++) {
     for (byte i = 0; i < maxCharPerLine; i ++) {
       int nextByte = readBackwards(file);
       if (nextByte == -1) {

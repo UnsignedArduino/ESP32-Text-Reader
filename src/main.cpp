@@ -51,8 +51,7 @@ void loop() {
   }
   if (readLeftButton()) {
     working();
-    file.seek(findLastPageLocation());
-    file.seek(findLastPageLocation());
+    file.seek(findLastPageLocation((maxLines * 2) + 1));
     nextFilePos = printFromLocation();
     notWorking();
   }
