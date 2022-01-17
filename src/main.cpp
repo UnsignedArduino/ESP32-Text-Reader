@@ -14,7 +14,7 @@ unsigned long fileSize = 0;
 unsigned long bytesOnScreen = 0;
 
 const byte maxCharPerLine = 42;
-const byte maxLines = 30;
+const byte maxLines = 31;
 
 void drawScrollbar(unsigned long startFilePos, unsigned long endFilePos, unsigned long fileSize) {
   Serial.println("Drawing scrollbar");
@@ -94,14 +94,30 @@ unsigned long printFromLocation() {
 unsigned long findLastPageLocation() {
   Serial.print("Back tracking from location ");
   Serial.println(file.position());
+  // for (byte row = 0; row < maxLines; row ++) {
+  //   for (byte col = 0; col < maxCharPerLine; col ++) {
+  //     if (!seekRelative(file, -1) || file.position() == 0) {
+  //       return 0;
+  //     }
+  //     if (peekBefore(file) == '\n') {
+  //       if (peekAtRelative(file, -2) == '\r') {
+  //         seekRelative(file, -2);
+  //       }
+  //       break;
+  //     }
+  //   }
+  // }
   for (byte row = 0; row < maxLines; row ++) {
-    for (byte col = 0; col < maxCharPerLine; col ++) {
-      if (!seekRelative(file, -1) || file.position() == 0) {
+    for (byte i = 0; i < maxCharPerLine; i ++) {
+      int nextByte = readBackwards(file);
+      if (nextByte == -1) {
+        Serial.print("Error reading or reached BOF!");
         return 0;
       }
-      if (peekBefore(file) == '\n') {
-        if (peekAtRelative(file, -2) == '\r') {
-          seekRelative(file, -2);
+      char ch = (char)nextByte;
+      if (ch == '\n') { // \n
+        if (peekBefore(file) == '\r') {
+          readBackwards(file);  // Advance backward one more because we still have \n to consume
         }
         break;
       }

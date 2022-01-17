@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <SD.h>
 #include "pinouts.h"
+#include "sdUtils.h"
 
 int beginSD() {
   Serial.println("Initializing SD card...");
@@ -12,8 +13,18 @@ int beginSD() {
   return 0;
 }
 
+
 bool seekRelative(File f, long difference) {
   return f.seek(f.position() + difference);
+}
+
+int readBackwards(File f) {
+  if (!seekRelative(f, -1)) {
+    return -1;
+  }
+  int theByte = f.read();
+  seekRelative(f, -1);
+  return theByte;
 }
 
 int peekBefore(File f) {
