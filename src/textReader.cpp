@@ -37,7 +37,7 @@ void drawScrollbar(unsigned long startFilePos, unsigned long endFilePos, unsigne
                       BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
 }
 
-unsigned long printFromLocation() {
+unsigned long printFromLocation(unsigned int rows) {
   Paint_Clear(WHITE);
 
   unsigned long startFilePos = file.position();
@@ -48,7 +48,8 @@ unsigned long printFromLocation() {
   Serial.println("Loading from file");
   bytesOnScreen = 0;
   // Serial.println("Got: ");
-  for (unsigned int yPos = 0; yPos < EPD_4IN2_WIDTH; yPos += 13) {
+  for (unsigned int row = 0; row < rows; row ++) {
+    unsigned int yPos = row * 13;
     char line[maxCharPerLine + 1] = "";
     byte i = 0;
     for ( ; i < maxCharPerLine; i ++) {
@@ -90,10 +91,10 @@ unsigned long printFromLocation() {
   return file.position();
 }
 
-unsigned long findLastPageLocation(unsigned int pages) {
+unsigned long findLastPageLocation(unsigned int rows) {
   Serial.print("Back tracking from location ");
   Serial.println(file.position());
-  for (byte row = 0; row < pages; row ++) {
+  for (byte row = 0; row < rows * 2 + 1; row ++) {
     for (byte i = 0; i < maxCharPerLine; i ++) {
       int nextByte = readBackwards(file);
       if (nextByte == -1) {

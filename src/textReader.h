@@ -12,6 +12,6 @@ extern const byte maxLines;
 
 void drawScrollbar(unsigned long startFilePos, unsigned long endFilePos, unsigned long fileSize);
 
-unsigned long printFromLocation();
+unsigned long printFromLocation(unsigned int rows);
 
-unsigned long findLastPageLocation(unsigned int pages);
+unsigned long findLastPageLocation(unsigned int rows);

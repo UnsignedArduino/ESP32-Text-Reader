@@ -37,7 +37,7 @@ void setup() {
 
   filePos = 0;
   file.seek(filePos);
-  nextFilePos = printFromLocation();
+  nextFilePos = printFromLocation(maxLines);
 
   notWorking();
 }
@@ -46,13 +46,13 @@ void loop() {
   if (readRightButton()) {
     working();
     file.seek(nextFilePos);
-    nextFilePos = printFromLocation();
+    nextFilePos = printFromLocation(maxLines);
     notWorking();
   }
   if (readLeftButton()) {
     working();
-    file.seek(findLastPageLocation((maxLines * 2) + 1));
-    nextFilePos = printFromLocation();
+    file.seek(findLastPageLocation(maxLines));
+    nextFilePos = printFromLocation(maxLines);
     notWorking();
   }
 }
