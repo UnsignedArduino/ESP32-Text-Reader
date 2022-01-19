@@ -12,12 +12,12 @@ unsigned long nextFilePos = 0;
 unsigned long fileSize = 0;
 unsigned long bytesOnScreen = 0;
 
-const byte maxCharPerLine = 42;
-const byte maxLines = 31;
+const byte maxCharPerLine = 40;
+const byte maxLines = 30;
 
 void drawScrollbar(unsigned long startFilePos, unsigned long endFilePos, unsigned long fileSize) {
   Serial.println("Drawing scrollbar");
-  Paint_DrawRectangle(EPD_4IN2_HEIGHT - 3, 1,
+  Paint_DrawRectangle(EPD_4IN2_HEIGHT - 4, 1,
                       EPD_4IN2_HEIGHT - 1, EPD_4IN2_WIDTH - 1, 
                       BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
   unsigned int startY, endY;
@@ -32,7 +32,7 @@ void drawScrollbar(unsigned long startFilePos, unsigned long endFilePos, unsigne
   Serial.print(startY);
   Serial.print(" to ");
   Serial.println(endY);
-  Paint_DrawRectangle(EPD_4IN2_HEIGHT - 2, startY,
+  Paint_DrawRectangle(EPD_4IN2_HEIGHT - 3, startY,
                       EPD_4IN2_HEIGHT - 1, endY,
                       BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
 }
