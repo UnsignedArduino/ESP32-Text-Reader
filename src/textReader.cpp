@@ -91,26 +91,30 @@ unsigned long printFromLocation(unsigned int rows) {
   return file.position();
 }
 
-unsigned long findLastPageLocation(unsigned int rows) {
-  Serial.print("Back tracking from location ");
-  Serial.println(file.position());
-  for (byte row = 0; row < rows * 2 + 1; row ++) {
-    for (byte i = 0; i < maxCharPerLine; i ++) {
-      int nextByte = readBackwards(file);
-      if (nextByte == -1) {
-        Serial.print("Error reading or reached BOF!");
-        return 0;
-      }
-      char ch = (char)nextByte;
-      if (ch == '\n') { // \n
-        if (peekBefore(file) == '\r') {
-          readBackwards(file);  // Advance backward one more because we still have \n to consume
+unsigned long getPosFromPage(unsigned long page, unsigned int rows) {
+  file.seek(0);
+  for (int p = 0; p < page; p ++) {
+    for (unsigned int row = 0; row < rows; row ++) {
+      for (byte i = 0; i < maxCharPerLine; i ++) {
+        int nextByte = file.read();
+        if (nextByte == -1) {
+          break;
         }
-        break;
+        char ch = (char)nextByte;
+        if (ch == '\n') { // \n
+          break;
+        } else if (ch == '\r') {  // \r\n
+          file.read();  // Advance forward one more because we still have \n to consume
+          break;
+        }
       }
     }
   }
-  Serial.print("New file position: ");
-  Serial.println(file.position());
-  return file.position();
+
+  unsigned long endFilePos = file.position();
+
+  Serial.print("Ended at position: "); 
+  Serial.println(endFilePos);
+
+  return endFilePos;
 }

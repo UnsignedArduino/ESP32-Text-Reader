@@ -14,4 +14,4 @@ void drawScrollbar(unsigned long startFilePos, unsigned long endFilePos, unsigne
 
 unsigned long printFromLocation(unsigned int rows);
 
-unsigned long findLastPageLocation(unsigned int rows);
+unsigned long getPosFromPage(unsigned long page, unsigned int rows);
