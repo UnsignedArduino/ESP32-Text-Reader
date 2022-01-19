@@ -37,6 +37,16 @@ void drawScrollbar(unsigned long startFilePos, unsigned long endFilePos, unsigne
                       BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
 }
 
+void drawTextReaderMenu(unsigned long page) {
+  Serial.println("Drawing text reader menu");
+  Paint_DrawRectangle(0, EPD_4IN2_WIDTH - (13 * 5),
+                      EPD_4IN2_HEIGHT, EPD_4IN2_WIDTH,
+                      WHITE, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+  Paint_DrawRectangle(1, EPD_4IN2_WIDTH - (13 * 5),
+                      EPD_4IN2_HEIGHT, EPD_4IN2_WIDTH,
+                      BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
+}
+
 unsigned long printFromLocation(unsigned int rows) {
   Paint_Clear(WHITE);
 
@@ -85,10 +95,12 @@ unsigned long printFromLocation(unsigned int rows) {
 
   drawScrollbar(startFilePos, endFilePos, fileSize);
 
+  return file.position();
+}
+
+void updateDisplay() {
   Serial.println("Showing contents");
   EPD_4IN2_Display(imageBuffer);
-
-  return file.position();
 }
 
 unsigned long getPosFromPage(unsigned long page, unsigned int rows) {

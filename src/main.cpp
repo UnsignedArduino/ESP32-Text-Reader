@@ -39,9 +39,7 @@ void setup() {
     noSdScreen();
     Serial.println("Waiting for button press to try again");
     notWorking();
-    while (!readLeftButton() && !readCenterButton() && !readRightButton()) {
-      ;
-    }
+    waitForButtonPress();
     working();
     Serial.println("Trying again");
   }
@@ -61,6 +59,7 @@ void setup() {
   filePos = 0;
   file.seek(filePos);
   nextFilePos = printFromLocation(maxLines);
+  updateDisplay();
 
   notWorking();
 }
@@ -88,24 +87,45 @@ void loop() {
     notWorking();
   }
   #endif
-  if (readRightButton()) {
-    working();
-    page ++;
-    Serial.print("Going to page ");
-    Serial.println(page);
-    // We can use where we left off
-    file.seek(nextFilePos);
-    nextFilePos = printFromLocation(maxLines);
-    notWorking();
-  }
   if (readLeftButton() && page > 0) {
     working();
     page --;
     Serial.print("Going to page ");
     Serial.println(page);
     // Have to seek back to beginning and count pages to here
-    file.seek(getPosFromPage(page, maxLines));
+    filePos = getPosFromPage(page, maxLines);
+    file.seek(filePos);
     nextFilePos = printFromLocation(maxLines);
+    updateDisplay();
+    notWorking();
+  }
+  if (readCenterButton()) {
+    working();
+    // Seek back to beginning of page and reprint it
+    file.seek(filePos);
+    nextFilePos = printFromLocation(maxLines);
+    drawTextReaderMenu(page);
+    updateDisplay();
+    Serial.println("Waiting for button press");
+    notWorking();
+    byte pressed = waitForButtonPress();
+    working();
+    file.seek(filePos);
+    nextFilePos = printFromLocation(maxLines);
+    updateDisplay();
+    notWorking();
+    waitForButtonRelease();
+  }
+  if (readRightButton()) {
+    working();
+    page ++;
+    Serial.print("Going to page ");
+    Serial.println(page);
+    // We can use where we left off
+    filePos = nextFilePos;
+    file.seek(nextFilePos);
+    nextFilePos = printFromLocation(maxLines);
+    updateDisplay();
     notWorking();
   }
 }
