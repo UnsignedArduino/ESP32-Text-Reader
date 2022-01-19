@@ -37,18 +37,30 @@ void drawScrollbar(unsigned long startFilePos, unsigned long endFilePos, unsigne
                       BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
 }
 
-void drawTextReaderMenu(unsigned long page) {
+void drawTextReaderMenu(unsigned int page) {
+  const byte linesToStickUp = 5;
   Serial.println("Drawing text reader menu");
-  Paint_DrawRectangle(0, EPD_4IN2_WIDTH - (13 * 5),
+  Paint_DrawRectangle(0, EPD_4IN2_WIDTH - (13 * linesToStickUp) - 2,
                       EPD_4IN2_HEIGHT, EPD_4IN2_WIDTH,
                       WHITE, DOT_PIXEL_1X1, DRAW_FILL_FULL);
-  Paint_DrawRectangle(1, EPD_4IN2_WIDTH - (13 * 5),
+  Paint_DrawRectangle(1, EPD_4IN2_WIDTH - (13 * linesToStickUp) - 2,
                       EPD_4IN2_HEIGHT, EPD_4IN2_WIDTH,
                       BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
   const unsigned int bufSize = 32;
   char buf[bufSize];
   snprintf(buf, bufSize, "On page %u", page);
-  Paint_DrawString_EN(2, EPD_4IN2_WIDTH - (13 * 5) + 2, buf, &Font12, WHITE, BLACK);
+  Paint_DrawString_EN(2, EPD_4IN2_WIDTH - (13 * linesToStickUp), 
+                      buf, 
+                      &Font12, WHITE, BLACK);
+  Paint_DrawString_EN(2, EPD_4IN2_WIDTH - (13 * (linesToStickUp - 2)), 
+                      "Left: Cancel", 
+                      &Font12, WHITE, BLACK);
+  Paint_DrawString_EN(2, EPD_4IN2_WIDTH - (13 * (linesToStickUp - 3)), 
+                      "Middle: Cancel", 
+                      &Font12, WHITE, BLACK);
+  Paint_DrawString_EN(2, EPD_4IN2_WIDTH - (13 * (linesToStickUp - 4)), 
+                      "Right: Cancel", 
+                      &Font12, WHITE, BLACK);
 }
 
 unsigned long printFromLocation(unsigned int rows) {
@@ -107,7 +119,7 @@ void updateDisplay() {
   EPD_4IN2_Display(imageBuffer);
 }
 
-unsigned long getPosFromPage(unsigned long page, unsigned int rows) {
+unsigned long getPosFromPage(unsigned int page, unsigned int rows) {
   file.seek(0);
   for (int p = 0; p < page; p ++) {
     for (unsigned int row = 0; row < rows; row ++) {

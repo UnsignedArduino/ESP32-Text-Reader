@@ -12,11 +12,10 @@ extern const byte maxLines;
 
 void drawScrollbar(unsigned long startFilePos, unsigned long endFilePos, unsigned long fileSize);
 
-void drawTextReaderMenu(unsigned long page);
+void drawTextReaderMenu(unsigned int page);
 
 unsigned long printFromLocation(unsigned int rows);
 
 void updateDisplay();
 
-unsigned long getPosFromPage(unsigned long page, unsigned int rows);
-
+unsigned long getPosFromPage(unsigned int page, unsigned int rows);
