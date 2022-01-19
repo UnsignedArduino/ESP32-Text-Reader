@@ -1,1 +1,1 @@
-#define SET_PAGE_VIA_SERIAL
+// #define SET_PAGE_VIA_SERIAL
