@@ -104,7 +104,8 @@ void loop() {
     // Seek back to beginning of page and reprint it
     file.seek(filePos);
     nextFilePos = printFromLocation(maxLines);
-    drawTextReaderMenu(page);
+    // Page is zero indexed
+    drawTextReaderMenu(page + 1);
     updateDisplay();
     Serial.println("Waiting for button press");
     notWorking();

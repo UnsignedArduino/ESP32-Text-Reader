@@ -45,6 +45,10 @@ void drawTextReaderMenu(unsigned long page) {
   Paint_DrawRectangle(1, EPD_4IN2_WIDTH - (13 * 5),
                       EPD_4IN2_HEIGHT, EPD_4IN2_WIDTH,
                       BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
+  const unsigned int bufSize = 32;
+  char buf[bufSize];
+  snprintf(buf, bufSize, "On page %u", page);
+  Paint_DrawString_EN(2, EPD_4IN2_WIDTH - (13 * 5) + 2, buf, &Font12, WHITE, BLACK);
 }
 
 unsigned long printFromLocation(unsigned int rows) {
