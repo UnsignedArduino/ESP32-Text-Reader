@@ -57,7 +57,7 @@ void drawTextReaderMenu(const char *filename, unsigned int page) {
                       buf, 
                       &Font12, WHITE, BLACK);
   Paint_DrawString_EN(2, EPD_4IN2_WIDTH - (13 * (linesToStickUp - 3)), 
-                      "Left: Cancel", 
+                      "Left: Exit", 
                       &Font12, WHITE, BLACK);
   Paint_DrawString_EN(2, EPD_4IN2_WIDTH - (13 * (linesToStickUp - 4)), 
                       "Middle: Cancel", 

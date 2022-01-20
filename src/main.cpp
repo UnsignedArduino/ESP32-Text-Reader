@@ -88,6 +88,12 @@ void textReader(const char* path) {
       Serial.println("Waiting for button press");
       notWorking();
       byte pressed = waitForButtonPress();
+      if (pressed == LEFT_BUTTON) {
+        Serial.println("Left button pressed, exiting!");
+        break;
+      } else if (pressed == RIGHT_BUTTON) {
+
+      }
       working();
       file.seek(filePos);
       nextFilePos = printFromLocation(maxLines);
@@ -108,6 +114,13 @@ void textReader(const char* path) {
       notWorking();
     }
   }
+
+  working();
+
+  Serial.println("Closing file");
+  file.close();
+
+  notWorking();
 }
 
 void setup() {
@@ -139,6 +152,11 @@ void setup() {
   notWorking();
 
   textReader("/text.txt");
+
+  working();
+  Paint_Clear(WHITE);
+  updateDisplay();
+  notWorking();
 }
 
 void loop() {
