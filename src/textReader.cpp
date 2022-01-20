@@ -37,7 +37,7 @@ void drawScrollbar(unsigned long startFilePos, unsigned long endFilePos, unsigne
                       BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
 }
 
-void drawTextReaderMenu(const char *filename, unsigned int page) {
+void drawTextReaderMenu(const char *filename, unsigned int page, unsigned int maxPage) {
   const byte linesToStickUp = 6;
   Serial.println("Drawing text reader menu");
   Paint_DrawRectangle(0, EPD_4IN2_WIDTH - (13 * linesToStickUp) - 2,
@@ -46,13 +46,13 @@ void drawTextReaderMenu(const char *filename, unsigned int page) {
   Paint_DrawRectangle(1, EPD_4IN2_WIDTH - (13 * linesToStickUp) - 2,
                       EPD_4IN2_HEIGHT, EPD_4IN2_WIDTH,
                       BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
-  const unsigned int bufSize = 32;
+  const unsigned int bufSize = maxCharPerLine + 1;
   char buf[bufSize];
   snprintf(buf, bufSize, "File: %s", filename);
   Paint_DrawString_EN(2, EPD_4IN2_WIDTH - (13 * linesToStickUp), 
                       buf, 
                       &Font12, WHITE, BLACK);
-  snprintf(buf, bufSize, "Page: %u", page);
+  snprintf(buf, bufSize, "Page: %u / %u", page, maxPage);
   Paint_DrawString_EN(2, EPD_4IN2_WIDTH - (13 * (linesToStickUp - 1)), 
                       buf, 
                       &Font12, WHITE, BLACK);
@@ -149,4 +149,35 @@ unsigned long getPosFromPage(unsigned int page, unsigned int rows) {
   Serial.println(endFilePos);
 
   return endFilePos;
+}
+
+unsigned int getMaxPage(unsigned int rows) {
+  Serial.println("Finding max page");
+  unsigned int page = 0;
+  file.seek(0);
+  while (true) {
+    for (unsigned int row = 0; row < rows; row ++) {
+      for (byte i = 0; i < maxCharPerLine; i ++) {
+        int nextByte = file.read();
+        if (nextByte == -1) {
+          Serial.print("Last page is ");
+          Serial.println(page);
+          return page;
+        }
+        char ch = (char)nextByte;
+        if (ch == '\n') { // \n
+          break;
+        } else if (ch == '\r') {  // \r\n
+          file.read();  // Advance forward one more because we still have \n to consume
+          break;
+        }
+      }
+    }
+    page ++;
+    if (page % 10 == 0) {
+      Serial.print("On page ");
+      Serial.print(page);
+      Serial.println(" and still counting");
+    }
+  }
 }

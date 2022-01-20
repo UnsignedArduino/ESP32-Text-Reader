@@ -8,13 +8,23 @@
 #include "textReader.h"
 #include "config.h"
 
-unsigned long page = 0;
+unsigned int page = 0;
+unsigned int maxPage = 0;
 
 void noSdScreen() {
   Paint_Clear(WHITE);
   Paint_DrawString_EN(0, 0, "No SD card is inserted!", &Font12, WHITE, BLACK);
   Paint_DrawString_EN(0, 26, "Please insert an SD card and press any ", &Font12, WHITE, BLACK);
   Paint_DrawString_EN(0, 39, "button to try again!", &Font12, WHITE, BLACK);
+  EPD_4IN2_Display(imageBuffer);
+}
+
+void loadingTextFile(const char* filePath) {
+  Paint_Clear(WHITE);
+  const unsigned int bufSize = maxCharPerLine + 1;
+  char buf[bufSize];
+  snprintf(buf, bufSize, "Loading text file: %s", filePath);
+  Paint_DrawString_EN(0, 0, buf, &Font12, WHITE, BLACK);
   EPD_4IN2_Display(imageBuffer);
 }
 
@@ -35,6 +45,14 @@ void textReader(const char* path) {
   Serial.print(fileSize);
   Serial.println(" bytes");
 
+  Serial.println("Finding max page");
+  loadingTextFile(path);
+
+  maxPage = getMaxPage(maxLines);
+  Serial.print("Max page: ");
+  Serial.println(maxPage);
+
+  Serial.println("First text print");
   filePos = 0;
   file.seek(filePos);
   nextFilePos = printFromLocation(maxLines);
@@ -47,7 +65,7 @@ void textReader(const char* path) {
     if (Serial.available()) {
       working();
       // Flush receive buffer
-      while(Serial.available()) {
+      while (Serial.available()) {
         Serial.read();
       }
       Serial.print("Current page is ");
@@ -60,8 +78,10 @@ void textReader(const char* path) {
       Serial.println(page);
       Serial.print("Going to page ");
       Serial.println(page);
-      file.seek(getPosFromPage(page, maxLines));
+      filePos = getPosFromPage(page, maxLines);
+      file.seek(filePos);
       nextFilePos = printFromLocation(maxLines);
+      updateDisplay();
       notWorking();
     }
     #endif
@@ -83,7 +103,7 @@ void textReader(const char* path) {
       file.seek(filePos);
       nextFilePos = printFromLocation(maxLines);
       // Page is zero indexed
-      drawTextReaderMenu(path, page + 1);
+      drawTextReaderMenu(path, page + 1, maxPage + 1);
       updateDisplay();
       Serial.println("Waiting for button press");
       notWorking();
@@ -101,7 +121,7 @@ void textReader(const char* path) {
       notWorking();
       waitForButtonRelease();
     }
-    if (readRightButton()) {
+    if (readRightButton() && page < maxPage) {
       working();
       page ++;
       Serial.print("Going to page ");
