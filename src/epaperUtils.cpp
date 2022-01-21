@@ -24,3 +24,22 @@ int beginEPaper() {
   Serial.println("Successfully prepared image buffer!");
   return 0;
 }
+
+void updateDisplay() {
+  Serial.println("Showing contents");
+  EPD_4IN2_Display(imageBuffer);
+}
+
+void updateDisplayPartial(unsigned int startx, unsigned int starty, unsigned int endx, unsigned int endy) {
+  Serial.println("Showing contents via partial refresh");
+  Serial.print("From (");
+  Serial.print(startx);
+  Serial.print(", ");
+  Serial.print(starty);
+  Serial.print(") to (");
+  Serial.print(endx);
+  Serial.print(", ");
+  Serial.print(endy);
+  Serial.println(")");
+  EPD_4IN2_PartialDisplay(startx, starty, endx, endy, imageBuffer);
+}

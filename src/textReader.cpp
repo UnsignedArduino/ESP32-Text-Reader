@@ -87,17 +87,32 @@ unsigned int askForPage(unsigned int curPg, unsigned int maxPg) {
   updateDisplay();
   notWorking();
   bool update = false;
+  unsigned int changeBy = 1;
   while (true) {
+    unsigned long startBtnPress = millis();
     byte pressed = waitForButtonPress();
     working();
+    waitForButtonRelease();
+    unsigned long endBtnPress = millis();
+    unsigned long btnDiff = endBtnPress - startBtnPress;
+    if (btnDiff > 5000) {
+      Serial.println("Change by 25!");
+      changeBy = 50;
+    } else if (btnDiff > 1000) {
+      Serial.println("Change by 10!");
+      changeBy = 10;
+    } else {
+      Serial.println("Change by 1!");
+      changeBy = 1;
+    }
     if (pressed == LEFT_BUTTON) {
-      if (value > 0) {
-        value --;
+      if (value >= /*0 +*/ changeBy) {
+        value -= changeBy;
         update = true;
       }
     } else if (pressed == RIGHT_BUTTON) {
-      if (value < maxPg) {
-        value ++;
+      if (value <= maxPg - changeBy) {
+        value += changeBy;
         update = true;
       }
     } else if (pressed == CENTER_BUTTON) {
@@ -105,15 +120,15 @@ unsigned int askForPage(unsigned int curPg, unsigned int maxPg) {
     }
     if (update) {
       snprintf(buf, bufSize, "Go to page: %u", value + 1);
-      Serial.println("New string: ");
+      Serial.print("New string: ");
       Serial.println(buf);
       const unsigned int startx = 0;
       const unsigned int starty = 52;
       const unsigned int endx = strlen(buf) * Font12.Width;
       const unsigned int endy = 52 + Font12.Height;
-      Paint_ClearWindows(startx, starty, endx, endy, WHITE);
+      Paint_DrawRectangle(startx, starty, endx, endy, WHITE, DOT_PIXEL_1X1, DRAW_FILL_FULL);
       Paint_DrawString_EN(startx, starty, buf, &Font12, WHITE, BLACK);
-      // EPD_4IN2_PartialDisplay(startx, starty, endx, endy, imageBuffer);
+      // updateDisplayPartial(startx, starty, endx, endy);
       updateDisplay();
       update = false;
     }
@@ -191,11 +206,6 @@ unsigned long printFromLocation(unsigned int rows) {
   drawScrollbar(startFilePos, endFilePos, fileSize);
 
   return file.position();
-}
-
-void updateDisplay() {
-  Serial.println("Showing contents");
-  EPD_4IN2_Display(imageBuffer);
 }
 
 unsigned long getPosFromPage(unsigned int page, unsigned int rows) {

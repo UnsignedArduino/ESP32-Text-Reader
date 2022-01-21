@@ -22,8 +22,6 @@ void loadingTextFile(const char* filePath);
 
 unsigned long printFromLocation(unsigned int rows);
 
-void updateDisplay();
-
 unsigned long getPosFromPage(unsigned int page, unsigned int rows);
 
 unsigned int getMaxPage(unsigned int rows);
