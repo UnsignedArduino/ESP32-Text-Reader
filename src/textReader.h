@@ -14,6 +14,10 @@ void drawScrollbar(unsigned long startFilePos, unsigned long endFilePos, unsigne
 
 void drawTextReaderMenu(const char* filename, unsigned int page, unsigned int maxPage);
 
+void noSdScreen();
+
+void loadingTextFile(const char* filePath);
+
 unsigned long printFromLocation(unsigned int rows);
 
 void updateDisplay();

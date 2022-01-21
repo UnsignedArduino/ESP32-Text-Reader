@@ -67,6 +67,23 @@ void drawTextReaderMenu(const char *filename, unsigned int page, unsigned int ma
                       &Font12, WHITE, BLACK);
 }
 
+void noSdScreen() {
+  Paint_Clear(WHITE);
+  Paint_DrawString_EN(0, 0, "No SD card is inserted!", &Font12, WHITE, BLACK);
+  Paint_DrawString_EN(0, 26, "Please insert an SD card and press any ", &Font12, WHITE, BLACK);
+  Paint_DrawString_EN(0, 39, "button to try again!", &Font12, WHITE, BLACK);
+  EPD_4IN2_Display(imageBuffer);
+}
+
+void loadingTextFile(const char* filePath) {
+  Paint_Clear(WHITE);
+  const unsigned int bufSize = maxCharPerLine + 1;
+  char buf[bufSize];
+  snprintf(buf, bufSize, "Loading text file: %s", filePath);
+  Paint_DrawString_EN(0, 0, buf, &Font12, WHITE, BLACK);
+  EPD_4IN2_Display(imageBuffer);
+}
+
 unsigned long printFromLocation(unsigned int rows) {
   Paint_Clear(WHITE);
 
