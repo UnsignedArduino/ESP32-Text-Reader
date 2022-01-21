@@ -95,7 +95,13 @@ void textReader(const char* path) {
         Serial.println("Left button pressed, exiting!");
         break;
       } else if (pressed == RIGHT_BUTTON) {
-
+        working();
+        Serial.println("Selecting page");
+        page = askForPage(page, maxPage);
+        Serial.print("Got page: ");
+        Serial.println(page);
+        filePos = getPosFromPage(page, maxLines);
+        notWorking();
       }
       working();
       file.seek(filePos);
@@ -159,6 +165,7 @@ void setup() {
   working();
   Paint_Clear(WHITE);
   updateDisplay();
+  EPD_4IN2_Sleep();
   notWorking();
 }
 

@@ -14,6 +14,8 @@ void drawScrollbar(unsigned long startFilePos, unsigned long endFilePos, unsigne
 
 void drawTextReaderMenu(const char* filename, unsigned int page, unsigned int maxPage);
 
+unsigned int askForPage(unsigned int curPg, unsigned int maxPg);
+
 void noSdScreen();
 
 void loadingTextFile(const char* filePath);

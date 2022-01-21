@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include <SD.h>
+#include "utils.h"
 #include "sdUtils.h"
+#include "buttonUtils.h"
 #include "epaperUtils.h"
 #include <GUI_Paint.h>
 #include "textReader.h"
@@ -63,8 +65,64 @@ void drawTextReaderMenu(const char *filename, unsigned int page, unsigned int ma
                       "Middle: Cancel", 
                       &Font12, WHITE, BLACK);
   Paint_DrawString_EN(2, EPD_4IN2_WIDTH - (13 * (linesToStickUp - 5)), 
-                      "Right: Cancel", 
+                      "Right: Go to page", 
                       &Font12, WHITE, BLACK);
+}
+
+unsigned int askForPage(unsigned int curPg, unsigned int maxPg) {
+  working();
+  unsigned int value = curPg;
+  Serial.println("Drawing page selector menu");
+  Paint_Clear(WHITE);
+  Paint_DrawString_EN(0, 0, "What page would you like to go to?", &Font12, WHITE, BLACK);
+  const unsigned int bufSize = maxCharPerLine + 1;
+  char buf[bufSize];
+  snprintf(buf, bufSize, "Current page: %u / %u", curPg + 1, maxPg + 1);
+  Paint_DrawString_EN(0, 26, buf, &Font12, WHITE, BLACK);
+  snprintf(buf, bufSize, "Go to page: %u", value + 1);
+  Paint_DrawString_EN(0, 52, buf, &Font12, WHITE, BLACK);
+  Paint_DrawString_EN(0, 78, "Left: Decrement", &Font12, WHITE, BLACK);
+  Paint_DrawString_EN(0, 91, "Middle: Enter", &Font12, WHITE, BLACK);
+  Paint_DrawString_EN(0, 104, "Right: Inclrement", &Font12, WHITE, BLACK);
+  updateDisplay();
+  notWorking();
+  bool update = false;
+  while (true) {
+    byte pressed = waitForButtonPress();
+    working();
+    if (pressed == LEFT_BUTTON) {
+      if (value > 0) {
+        value --;
+        update = true;
+      }
+    } else if (pressed == RIGHT_BUTTON) {
+      if (value < maxPg) {
+        value ++;
+        update = true;
+      }
+    } else if (pressed == CENTER_BUTTON) {
+      break;
+    }
+    if (update) {
+      snprintf(buf, bufSize, "Go to page: %u", value + 1);
+      Serial.println("New string: ");
+      Serial.println(buf);
+      const unsigned int startx = 0;
+      const unsigned int starty = 52;
+      const unsigned int endx = strlen(buf) * Font12.Width;
+      const unsigned int endy = 52 + Font12.Height;
+      Paint_ClearWindows(startx, starty, endx, endy, WHITE);
+      Paint_DrawString_EN(startx, starty, buf, &Font12, WHITE, BLACK);
+      // EPD_4IN2_PartialDisplay(startx, starty, endx, endy, imageBuffer);
+      updateDisplay();
+      update = false;
+    }
+    notWorking();
+  }
+  working();
+  Serial.print("User selected page: ");
+  Serial.println(value);
+  return value;
 }
 
 void noSdScreen() {
