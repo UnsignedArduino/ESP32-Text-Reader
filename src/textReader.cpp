@@ -91,14 +91,27 @@ unsigned int askForPage(unsigned int curPg, unsigned int maxPg) {
   while (true) {
     unsigned long startBtnPress = millis();
     byte pressed = waitForButtonPress();
+    while (anyButtonPressed()) {
+      unsigned long blinkDelay;
+      if (millis() - startBtnPress > 5000) {
+        blinkDelay = 50;
+      } else if (millis() - startBtnPress > 3000) {
+        blinkDelay = 100;
+      } else {
+        blinkDelay = 200;
+      }
+      working();
+      delay(blinkDelay);
+      notWorking();
+      delay(blinkDelay);
+    }
     working();
-    waitForButtonRelease();
     unsigned long endBtnPress = millis();
     unsigned long btnDiff = endBtnPress - startBtnPress;
     if (btnDiff > 5000) {
       Serial.println("Change by 25!");
       changeBy = 50;
-    } else if (btnDiff > 1000) {
+    } else if (btnDiff > 3000) {
       Serial.println("Change by 10!");
       changeBy = 10;
     } else {

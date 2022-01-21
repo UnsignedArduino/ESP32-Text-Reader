@@ -14,3 +14,5 @@ int beginButtons();
 byte waitForButtonPress();
 
 void waitForButtonRelease();
+
+bool anyButtonPressed();

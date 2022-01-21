@@ -29,3 +29,6 @@ void waitForButtonRelease() {
   }
 }
 
+bool anyButtonPressed() {
+  return readLeftButton() || readCenterButton() || readRightButton();
+}
