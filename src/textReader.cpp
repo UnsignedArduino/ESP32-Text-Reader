@@ -73,24 +73,45 @@ unsigned int askForPage(unsigned int curPg, unsigned int maxPg) {
   working();
   unsigned int value = curPg;
   Serial.println("Drawing page selector menu");
-  Paint_Clear(WHITE);
-  Paint_DrawString_EN(0, 0, "What page would you like to go to?", &Font12, WHITE, BLACK);
-  const unsigned int bufSize = maxCharPerLine + 1;
-  char buf[bufSize];
-  snprintf(buf, bufSize, "Current page: %u / %u", curPg + 1, maxPg + 1);
-  Paint_DrawString_EN(0, 26, buf, &Font12, WHITE, BLACK);
-  snprintf(buf, bufSize, "Go to page: %u", value + 1);
-  Paint_DrawString_EN(0, 52, buf, &Font12, WHITE, BLACK);
-  Paint_DrawString_EN(0, 78, "Left: Decrement", &Font12, WHITE, BLACK);
-  Paint_DrawString_EN(0, 91, "Middle: Enter", &Font12, WHITE, BLACK);
-  Paint_DrawString_EN(0, 104, "Right: Inclrement", &Font12, WHITE, BLACK);
-  updateDisplay();
   notWorking();
-  bool update = false;
+  bool update = true;
   unsigned int changeBy = 1;
   while (true) {
-    unsigned long startBtnPress = millis();
+    if (update) {
+      Paint_Clear(WHITE);
+      // Seek back to beginning of page and reprint it
+      file.seek(filePos);
+      nextFilePos = printFromLocation(maxLines);
+      const byte linesToStickUp = 9;
+      Paint_DrawRectangle(0, EPD_4IN2_WIDTH - (13 * linesToStickUp) - 2,
+                      EPD_4IN2_HEIGHT, EPD_4IN2_WIDTH,
+                      WHITE, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+      Paint_DrawRectangle(1, EPD_4IN2_WIDTH - (13 * linesToStickUp) - 2,
+                          EPD_4IN2_HEIGHT, EPD_4IN2_WIDTH,
+                          BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
+      const unsigned int bufSize = maxCharPerLine + 1;
+      char buf[bufSize];
+      Paint_DrawString_EN(2, EPD_4IN2_WIDTH - (13 * linesToStickUp), 
+                          "What page would you like to go to?", 
+                          &Font12, WHITE, BLACK);
+      snprintf(buf, bufSize, "Current page: %u / %u", curPg + 1, maxPg + 1);
+      Paint_DrawString_EN(2, EPD_4IN2_WIDTH - (13 * (linesToStickUp - 2)), 
+                          buf, &Font12, WHITE, BLACK);
+      snprintf(buf, bufSize, "Go to page: %u", value + 1);
+      Paint_DrawString_EN(2, EPD_4IN2_WIDTH - (13 * (linesToStickUp - 4)), 
+                          buf, &Font12, WHITE, BLACK);
+      Paint_DrawString_EN(2, EPD_4IN2_WIDTH - (13 * (linesToStickUp - 6)), 
+                          "Left: Decrement", &Font12, WHITE, BLACK);
+      Paint_DrawString_EN(2, EPD_4IN2_WIDTH - (13 * (linesToStickUp - 7)), 
+                          "Middle: Enter", &Font12, WHITE, BLACK);
+      Paint_DrawString_EN(2, EPD_4IN2_WIDTH - (13 * (linesToStickUp - 8)), 
+                          "Right: Increment", &Font12, WHITE, BLACK);
+      updateDisplay();
+      update = false;
+    }
+    notWorking();
     byte pressed = waitForButtonPress();
+    unsigned long startBtnPress = millis();
     while (anyButtonPressed()) {
       unsigned long blinkDelay;
       if (millis() - startBtnPress > 5000) {
@@ -131,21 +152,6 @@ unsigned int askForPage(unsigned int curPg, unsigned int maxPg) {
     } else if (pressed == CENTER_BUTTON) {
       break;
     }
-    if (update) {
-      snprintf(buf, bufSize, "Go to page: %u", value + 1);
-      Serial.print("New string: ");
-      Serial.println(buf);
-      const unsigned int startx = 0;
-      const unsigned int starty = 52;
-      const unsigned int endx = strlen(buf) * Font12.Width;
-      const unsigned int endy = 52 + Font12.Height;
-      Paint_DrawRectangle(startx, starty, endx, endy, WHITE, DOT_PIXEL_1X1, DRAW_FILL_FULL);
-      Paint_DrawString_EN(startx, starty, buf, &Font12, WHITE, BLACK);
-      // updateDisplayPartial(startx, starty, endx, endy);
-      updateDisplay();
-      update = false;
-    }
-    notWorking();
   }
   working();
   Serial.print("User selected page: ");
