@@ -39,34 +39,39 @@ void drawScrollbar(unsigned long startFilePos, unsigned long endFilePos, unsigne
                       BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
 }
 
+void drawDialog(const char* lines[], byte lineCount) {
+  Paint_DrawRectangle(0, EPD_4IN2_WIDTH - (13 * lineCount) - 2,
+                      EPD_4IN2_HEIGHT, EPD_4IN2_WIDTH,
+                      WHITE, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+  Paint_DrawRectangle(1, EPD_4IN2_WIDTH - (13 * lineCount) - 2,
+                      EPD_4IN2_HEIGHT, EPD_4IN2_WIDTH,
+                      BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
+  for (int i = 0; i < lineCount; i ++) {
+    Serial.print("Line ");
+    Serial.print(i);
+    Serial.print(": ");
+    Serial.println(lines[i]);
+    Paint_DrawString_EN(2, EPD_4IN2_WIDTH - (13 * (lineCount - i)), lines[i], &Font12, WHITE, BLACK);
+  }
+}
+
 void drawTextReaderMenu(const char *filename, unsigned int page, unsigned int maxPage) {
   const byte linesToStickUp = 6;
   Serial.println("Drawing text reader menu");
-  Paint_DrawRectangle(0, EPD_4IN2_WIDTH - (13 * linesToStickUp) - 2,
-                      EPD_4IN2_HEIGHT, EPD_4IN2_WIDTH,
-                      WHITE, DOT_PIXEL_1X1, DRAW_FILL_FULL);
-  Paint_DrawRectangle(1, EPD_4IN2_WIDTH - (13 * linesToStickUp) - 2,
-                      EPD_4IN2_HEIGHT, EPD_4IN2_WIDTH,
-                      BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
-  const unsigned int bufSize = maxCharPerLine + 1;
-  char buf[bufSize];
-  snprintf(buf, bufSize, "File: %s", filename);
-  Paint_DrawString_EN(2, EPD_4IN2_WIDTH - (13 * linesToStickUp), 
-                      buf, 
-                      &Font12, WHITE, BLACK);
-  snprintf(buf, bufSize, "Page: %u / %u", page, maxPage);
-  Paint_DrawString_EN(2, EPD_4IN2_WIDTH - (13 * (linesToStickUp - 1)), 
-                      buf, 
-                      &Font12, WHITE, BLACK);
-  Paint_DrawString_EN(2, EPD_4IN2_WIDTH - (13 * (linesToStickUp - 3)), 
-                      "Left: Exit", 
-                      &Font12, WHITE, BLACK);
-  Paint_DrawString_EN(2, EPD_4IN2_WIDTH - (13 * (linesToStickUp - 4)), 
-                      "Middle: Cancel", 
-                      &Font12, WHITE, BLACK);
-  Paint_DrawString_EN(2, EPD_4IN2_WIDTH - (13 * (linesToStickUp - 5)), 
-                      "Right: Go to page", 
-                      &Font12, WHITE, BLACK);
+  const byte bufSize = maxCharPerLine + 1;
+  char fileBuf[bufSize];
+  snprintf(fileBuf, bufSize, "File: %s", filename);
+  char pageBuf[bufSize];
+  snprintf(pageBuf, bufSize, "Page: %u / %u", page, maxPage);
+  const char *lines[linesToStickUp] = {
+    fileBuf,
+    pageBuf,
+    "",
+    "Left: Exit",
+    "Middle: Cancel",
+    "Right: Go to page"
+  };
+  drawDialog(lines, linesToStickUp);
 }
 
 unsigned int askForPage(unsigned int curPg, unsigned int maxPg) {
@@ -78,79 +83,75 @@ unsigned int askForPage(unsigned int curPg, unsigned int maxPg) {
   unsigned int changeBy = 1;
   while (true) {
     if (update) {
+      working();
       Paint_Clear(WHITE);
       // Seek back to beginning of page and reprint it
       file.seek(filePos);
       nextFilePos = printFromLocation(maxLines);
       const byte linesToStickUp = 9;
-      Paint_DrawRectangle(0, EPD_4IN2_WIDTH - (13 * linesToStickUp) - 2,
-                      EPD_4IN2_HEIGHT, EPD_4IN2_WIDTH,
-                      WHITE, DOT_PIXEL_1X1, DRAW_FILL_FULL);
-      Paint_DrawRectangle(1, EPD_4IN2_WIDTH - (13 * linesToStickUp) - 2,
-                          EPD_4IN2_HEIGHT, EPD_4IN2_WIDTH,
-                          BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
       const unsigned int bufSize = maxCharPerLine + 1;
-      char buf[bufSize];
-      Paint_DrawString_EN(2, EPD_4IN2_WIDTH - (13 * linesToStickUp), 
-                          "What page would you like to go to?", 
-                          &Font12, WHITE, BLACK);
-      snprintf(buf, bufSize, "Current page: %u / %u", curPg + 1, maxPg + 1);
-      Paint_DrawString_EN(2, EPD_4IN2_WIDTH - (13 * (linesToStickUp - 2)), 
-                          buf, &Font12, WHITE, BLACK);
-      snprintf(buf, bufSize, "Go to page: %u", value + 1);
-      Paint_DrawString_EN(2, EPD_4IN2_WIDTH - (13 * (linesToStickUp - 4)), 
-                          buf, &Font12, WHITE, BLACK);
-      Paint_DrawString_EN(2, EPD_4IN2_WIDTH - (13 * (linesToStickUp - 6)), 
-                          "Left: Decrement", &Font12, WHITE, BLACK);
-      Paint_DrawString_EN(2, EPD_4IN2_WIDTH - (13 * (linesToStickUp - 7)), 
-                          "Middle: Enter", &Font12, WHITE, BLACK);
-      Paint_DrawString_EN(2, EPD_4IN2_WIDTH - (13 * (linesToStickUp - 8)), 
-                          "Right: Increment", &Font12, WHITE, BLACK);
+      char curPageBuf[bufSize];
+      snprintf(curPageBuf, bufSize, "Current page: %u / %u", curPg + 1, maxPg + 1);
+      char goPageBuf[bufSize];
+      snprintf(goPageBuf, bufSize, "Go to page: %u", value + 1);
+      const char *lines[linesToStickUp] = {
+        "What page would you like to go to?",
+        "",
+        curPageBuf,
+        "",
+        goPageBuf,
+        "",
+        "Left: Decrement",
+        "Middle: Enter",
+        "Right: Increment"
+      };
+      drawDialog(lines, linesToStickUp);
       updateDisplay();
       update = false;
-    }
-    notWorking();
-    byte pressed = waitForButtonPress();
-    unsigned long startBtnPress = millis();
-    while (anyButtonPressed()) {
-      unsigned long blinkDelay;
-      if (millis() - startBtnPress > 5000) {
-        blinkDelay = 50;
-      } else if (millis() - startBtnPress > 3000) {
-        blinkDelay = 100;
-      } else {
-        blinkDelay = 200;
-      }
-      working();
-      delay(blinkDelay);
       notWorking();
-      delay(blinkDelay);
     }
-    working();
-    unsigned long endBtnPress = millis();
-    unsigned long btnDiff = endBtnPress - startBtnPress;
-    if (btnDiff > 5000) {
-      Serial.println("Change by 25!");
-      changeBy = 50;
-    } else if (btnDiff > 3000) {
-      Serial.println("Change by 10!");
-      changeBy = 10;
-    } else {
-      Serial.println("Change by 1!");
-      changeBy = 1;
-    }
-    if (pressed == LEFT_BUTTON) {
-      if (value >= /*0 +*/ changeBy) {
-        value -= changeBy;
-        update = true;
-      }
-    } else if (pressed == RIGHT_BUTTON) {
-      if (value <= maxPg - changeBy) {
-        value += changeBy;
-        update = true;
-      }
-    } else if (pressed == CENTER_BUTTON) {
+    byte pressed = waitForButtonPress();
+    if (pressed == CENTER_BUTTON) {
       break;
+    } else {
+      unsigned long startBtnPress = millis();
+      while (anyButtonPressed()) {
+        unsigned long blinkDelay;
+        if (millis() - startBtnPress > 5000) {
+          blinkDelay = 50;
+        } else if (millis() - startBtnPress > 3000) {
+          blinkDelay = 100;
+        } else {
+          blinkDelay = 200;
+        }
+        working();
+        delay(blinkDelay);
+        notWorking();
+        delay(blinkDelay);
+      }
+      unsigned long endBtnPress = millis();
+      unsigned long btnDiff = endBtnPress - startBtnPress;
+      if (btnDiff > 5000) {
+        Serial.println("Change by 25!");
+        changeBy = 50;
+      } else if (btnDiff > 3000) {
+        Serial.println("Change by 10!");
+        changeBy = 10;
+      } else {
+        Serial.println("Change by 1!");
+        changeBy = 1;
+      }
+      if (pressed == LEFT_BUTTON) {
+        if (value >= /*0 +*/ changeBy) {
+          value -= changeBy;
+          update = true;
+        }
+      } else if (pressed == RIGHT_BUTTON) {
+        if (value <= maxPg - changeBy) {
+          value += changeBy;
+          update = true;
+        }
+      }
     }
   }
   working();
@@ -160,20 +161,26 @@ unsigned int askForPage(unsigned int curPg, unsigned int maxPg) {
 }
 
 void noSdScreen() {
+  const byte linesToStickUp = 3;
+  const char *lines[linesToStickUp] = {
+    "No SD card is inserted!",
+    "Please insert an SD card and press",
+    "any button to try again!"
+  };
   Paint_Clear(WHITE);
-  Paint_DrawString_EN(0, 0, "No SD card is inserted!", &Font12, WHITE, BLACK);
-  Paint_DrawString_EN(0, 26, "Please insert an SD card and press any ", &Font12, WHITE, BLACK);
-  Paint_DrawString_EN(0, 39, "button to try again!", &Font12, WHITE, BLACK);
-  EPD_4IN2_Display(imageBuffer);
+  drawDialog(lines, linesToStickUp);
+  updateDisplay();
 }
 
 void loadingTextFile(const char* filePath) {
+  const byte linesToStickUp = 2;
+  const char *lines[linesToStickUp] = {
+    "Loading text file:",
+    filePath
+  };
   Paint_Clear(WHITE);
-  const unsigned int bufSize = maxCharPerLine + 1;
-  char buf[bufSize];
-  snprintf(buf, bufSize, "Loading text file: %s", filePath);
-  Paint_DrawString_EN(0, 0, buf, &Font12, WHITE, BLACK);
-  EPD_4IN2_Display(imageBuffer);
+  drawDialog(lines, linesToStickUp);
+  updateDisplay();
 }
 
 unsigned long printFromLocation(unsigned int rows) {

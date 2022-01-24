@@ -12,6 +12,8 @@ extern const byte maxLines;
 
 void drawScrollbar(unsigned long startFilePos, unsigned long endFilePos, unsigned long fileSize);
 
+void drawDialog(const char* lines[], byte lineCount);
+
 void drawTextReaderMenu(const char* filename, unsigned int page, unsigned int maxPage);
 
 unsigned int askForPage(unsigned int curPg, unsigned int maxPg);
