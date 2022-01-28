@@ -5,6 +5,7 @@
 #include "epaperUtils.h"
 #include <GUI_Paint.h>
 #include "buttonUtils.h"
+#include "battUtils.h"
 #include "textReader.h"
 #include "config.h"
 
@@ -143,6 +144,9 @@ void setup() {
   #endif
 
   beginButtons();
+
+  beginBattReader();
+  readBatt();
 
   if (beginEPaper() != 0) {
     blinkError(250, 250);

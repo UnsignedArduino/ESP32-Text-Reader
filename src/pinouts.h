@@ -13,4 +13,12 @@ const byte leftButtonPin = 32;
 const byte centerButtonPin = 33;
 const byte rightButtonPin = 25;
 
+// Battery reading connections
+
+const byte transistorPin = 27;
+const byte battPin = 26;
+
+const unsigned long milliVoltScale = 2;
+const unsigned long milliVoltDiff = 600;
+
 #endif
