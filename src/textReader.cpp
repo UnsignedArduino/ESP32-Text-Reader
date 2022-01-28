@@ -3,6 +3,7 @@
 #include "utils.h"
 #include "sdUtils.h"
 #include "buttonUtils.h"
+#include "battUtils.h"
 #include "epaperUtils.h"
 #include <GUI_Paint.h>
 #include "textReader.h"
@@ -56,16 +57,19 @@ void drawDialog(const char* lines[], byte lineCount) {
 }
 
 void drawTextReaderMenu(const char *filename, unsigned int page, unsigned int maxPage) {
-  const byte linesToStickUp = 6;
+  const byte linesToStickUp = 7;
   Serial.println("Drawing text reader menu");
   const byte bufSize = maxCharPerLine + 1;
   char fileBuf[bufSize];
   snprintf(fileBuf, bufSize, "File: %s", filename);
   char pageBuf[bufSize];
   snprintf(pageBuf, bufSize, "Page: %u / %u", page, maxPage);
+  char battBuf[bufSize];
+  snprintf(battBuf, bufSize, "Battery: %#.2Fv", (float)readBatt() / 1000.0);
   const char *lines[linesToStickUp] = {
     fileBuf,
     pageBuf,
+    battBuf,
     "",
     "Left: Exit",
     "Middle: Cancel",
