@@ -65,7 +65,8 @@ void drawTextReaderMenu(const char *filename, unsigned int page, unsigned int ma
   char pageBuf[bufSize];
   snprintf(pageBuf, bufSize, "Page: %u / %u", page, maxPage);
   char battBuf[bufSize];
-  snprintf(battBuf, bufSize, "Battery: %#.2Fv", (float)readBatt() / 1000.0);
+  // snprintf(battBuf, bufSize, "Battery: %#.2Fv", (float)readBatt() / 1000.0);
+  snprintf(battBuf, bufSize, "Battery: %u%%", readPercent());
   const char *lines[linesToStickUp] = {
     fileBuf,
     pageBuf,

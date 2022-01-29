@@ -3,3 +3,5 @@
 int beginBattReader();
 
 unsigned long readBatt();
+
+byte readPercent();
