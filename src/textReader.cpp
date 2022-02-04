@@ -85,7 +85,6 @@ unsigned int askForPage(unsigned int curPg, unsigned int maxPg) {
   Serial.println("Drawing page selector menu");
   notWorking();
   bool update = true;
-  unsigned int changeBy = 1;
   while (true) {
     if (update) {
       working();
@@ -122,7 +121,9 @@ unsigned int askForPage(unsigned int curPg, unsigned int maxPg) {
       unsigned long startBtnPress = millis();
       while (anyButtonPressed()) {
         unsigned long blinkDelay;
-        if (millis() - startBtnPress > 5000) {
+        if (millis() - startBtnPress > 9000) {
+          blinkDelay = 25;
+        } else if (millis() - startBtnPress > 6000) {
           blinkDelay = 50;
         } else if (millis() - startBtnPress > 3000) {
           blinkDelay = 100;
@@ -136,26 +137,28 @@ unsigned int askForPage(unsigned int curPg, unsigned int maxPg) {
       }
       unsigned long endBtnPress = millis();
       unsigned long btnDiff = endBtnPress - startBtnPress;
-      if (btnDiff > 5000) {
-        Serial.println("Change by 25!");
+      unsigned int changeBy;
+      if (btnDiff > 9000) {
+        changeBy = 100;
+      } else if (btnDiff > 6000) {
         changeBy = 50;
       } else if (btnDiff > 3000) {
-        Serial.println("Change by 10!");
         changeBy = 10;
       } else {
-        Serial.println("Change by 1!");
         changeBy = 1;
       }
+      Serial.print("Change by ");
+      Serial.println(changeBy);
       if (pressed == LEFT_BUTTON) {
-        if (value >= /*0 +*/ changeBy) {
+        if (changeBy > value) {
+          value = 0;
+        } else {
           value -= changeBy;
-          update = true;
         }
+        update = true;
       } else if (pressed == RIGHT_BUTTON) {
-        if (value <= maxPg - changeBy) {
-          value += changeBy;
-          update = true;
-        }
+        value = min(value + changeBy, maxPg);
+        update = true;
       }
     }
   }
