@@ -12,6 +12,8 @@
 unsigned int page = 0;
 unsigned int maxPage = 0;
 
+const byte maxPathLen = 1 + 8 + 1 + 3 + 1;
+
 void textReader(const char* path) {
   working();
 
@@ -133,6 +135,70 @@ void textReader(const char* path) {
   notWorking();
 }
 
+void fileSelector(char* pathBuf, byte maxPathLen) {
+  working();
+  byte fileIdx = 0;
+  byte maxFileIdx = filesInRoot() - 1;
+  notWorking();
+  while (true) {
+    working();
+    Paint_Clear(WHITE);
+    Serial.print("Selected file: ");
+    Serial.print(fileIdx);
+    Serial.print("/");
+    Serial.println(maxFileIdx);
+    const byte linesToStickUp = 5;
+    File root = SD.open("/");
+    Serial.println("Contents:");
+    for (unsigned int row = 0; row < maxLines - maxLines - 2; ) {
+      unsigned int yPos = row * 13;
+      char line[maxCharPerLine + 1];
+      File entry = root.openNextFile();
+      if (!entry) {
+        break;
+      }
+      if (entry.isDirectory()) {
+        continue;
+      }
+      if (row == fileIdx) {
+        snprintf(line, maxCharPerLine + 1, "> %s", entry.name());
+      } else {
+        snprintf(line, maxCharPerLine + 1, "  %s", entry.name());
+      }
+      Serial.println(line);
+      Paint_DrawString_EN(0, yPos, line, &Font12, WHITE, BLACK);
+      row ++;
+    }
+    root.close();
+    const char *lines[linesToStickUp] = {
+      "Select a text file",
+      "",
+      "Left: Move up",
+      "Center: Select",
+      "Right: Move down"
+    };
+    drawDialog(lines, linesToStickUp);
+    updateDisplay();
+    notWorking();
+    while (true) {
+      byte pressed = waitForButtonPress();
+      if (pressed == LEFT_BUTTON) {
+        if (fileIdx > 0) {
+          fileIdx --;
+          break;
+        }
+      } else if (pressed == CENTER_BUTTON) {
+        // set filename and return
+      } else {
+        if (fileIdx < maxFileIdx) {
+          fileIdx ++;
+          break;
+        }
+      }
+    }
+  }
+}
+
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   working();
@@ -162,9 +228,26 @@ void setup() {
     Serial.println("Trying again");
   }
 
+  if (filesInRoot() == 0) {
+    Serial.println("No files in root directory!");
+    noTextFilesScreen();
+    notWorking();
+    Serial.println("Infinite looping");
+    while (true) {
+      ;
+    }
+  }
+
   notWorking();
 
-  textReader("/text.txt");
+  while (true) {
+    // char* selected_path = "/text.txt";
+    char selected_path[maxPathLen];
+    fileSelector(selected_path, maxPathLen);
+    Serial.print("Path selected: ");
+    Serial.println(selected_path);
+    textReader(selected_path);
+  }
 
   working();
   Paint_Clear(WHITE);

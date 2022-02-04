@@ -20,6 +20,8 @@ unsigned int askForPage(unsigned int curPg, unsigned int maxPg);
 
 void noSdScreen();
 
+void noTextFilesScreen();
+
 void loadingTextFile(const char* filePath);
 
 unsigned long printFromLocation(unsigned int rows);

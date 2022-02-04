@@ -3,6 +3,8 @@
 
 int beginSD();
 
+unsigned int filesInRoot();
+
 bool seekRelative(File f, long difference);
 
 int readBackwards(File f);

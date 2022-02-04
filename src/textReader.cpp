@@ -177,6 +177,20 @@ void noSdScreen() {
   updateDisplay();
 }
 
+void noTextFilesScreen() {
+  const byte linesToStickUp = 5;
+  const char *lines[linesToStickUp] = {
+    "No files on SD card!"
+    "",
+    "Please add some text files to the SD ",
+    "card, then turn the device off and ",
+    "back on!"
+  };
+  Paint_Clear(WHITE);
+  drawDialog(lines, linesToStickUp);
+  updateDisplay();
+}
+
 void loadingTextFile(const char* filePath) {
   const byte linesToStickUp = 2;
   const char *lines[linesToStickUp] = {

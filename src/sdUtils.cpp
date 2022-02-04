@@ -13,6 +13,27 @@ int beginSD() {
   return 0;
 }
 
+unsigned int filesInRoot() {
+  unsigned int fileCount = 0;
+  File root = SD.open("/");
+  while (true) {
+    File entry = root.openNextFile();
+    if (!entry) {
+      break;
+    }
+    if (entry.isDirectory()) {
+      continue;
+    }
+    Serial.print("Found file: ");
+    Serial.println(entry.name());
+    entry.close();
+    fileCount ++;
+  }
+  root.close();
+  Serial.print("File count: ");
+  Serial.println(fileCount);
+  return fileCount;
+}
 
 bool seekRelative(File f, long difference) {
   return f.seek(f.position() + difference);
