@@ -1,6 +1,7 @@
 #include <Arduino.h>
+#include <SdFat.h>
 
-extern File file;
+extern FsFile file;
 extern unsigned long filePos;
 extern unsigned long nextFilePos;
 

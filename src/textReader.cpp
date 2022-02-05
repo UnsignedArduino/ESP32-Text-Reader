@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <SD.h>
+#include <SdFat.h>
 #include "utils.h"
 #include "sdUtils.h"
 #include "buttonUtils.h"
@@ -8,7 +8,7 @@
 #include <GUI_Paint.h>
 #include "textReader.h"
 
-File file;
+FsFile file;
 unsigned long filePos = 0;
 unsigned long nextFilePos = 0;
 

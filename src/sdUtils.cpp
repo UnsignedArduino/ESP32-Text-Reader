@@ -1,11 +1,14 @@
 #include <Arduino.h>
-#include <SD.h>
+#include <SdFat.h>
 #include "pinouts.h"
 #include "sdUtils.h"
 
+SdFat sd;
+
 int beginSD() {
   Serial.println("Initializing SD card...");
-  if (!SD.begin(sdCS)) {
+  if (!sd.begin(SD_CONFIG)) {
+    sd.initErrorPrint();
     Serial.println("Error initializing SD card!");
     return 1;
   }
@@ -15,9 +18,9 @@ int beginSD() {
 
 unsigned int filesInRoot() {
   unsigned int fileCount = 0;
-  File root = SD.open("/");
+  FsFile root = sd.open("/");
   while (true) {
-    File entry = root.openNextFile();
+    FsFile entry = root.openNextFile();
     if (!entry) {
       break;
     }
@@ -25,7 +28,8 @@ unsigned int filesInRoot() {
       continue;
     }
     Serial.print("Found file: ");
-    Serial.println(entry.name());
+    // Serial.println(entry.name());
+    entry.printName(&Serial);
     entry.close();
     fileCount ++;
   }
@@ -35,11 +39,11 @@ unsigned int filesInRoot() {
   return fileCount;
 }
 
-bool seekRelative(File f, long difference) {
+bool seekRelative(FsFile f, long difference) {
   return f.seek(f.position() + difference);
 }
 
-int readBackwards(File f) {
+int readBackwards(FsFile f) {
   if (!seekRelative(f, -1)) {
     return -1;
   }
@@ -48,14 +52,14 @@ int readBackwards(File f) {
   return theByte;
 }
 
-int peekBefore(File f) {
+int peekBefore(FsFile f) {
   if (!seekRelative(f, -1)) {
     return -1;
   }
   return f.read();
 }
 
-int peekAtRelative(File f, long difference) {
+int peekAtRelative(FsFile f, long difference) {
   unsigned long position = f.position();
   if (!seekRelative(f, difference)) {
     return -1;

@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <SD.h>
+#include <SdFat.h>
 #include "utils.h"
 #include "sdUtils.h"
 #include "epaperUtils.h"
@@ -12,14 +12,14 @@
 unsigned int page = 0;
 unsigned int maxPage = 0;
 
-const byte maxPathLen = 1 + 8 + 1 + 3 + 1;
+const byte maxPathLen = 255;
 
 void textReader(const char* path) {
   working();
 
   Serial.print("Opening ");
   Serial.println(path);
-  file = SD.open(path, FILE_READ);
+  file = sd.open(path, FILE_READ);
   if (!file) {
     Serial.print("Unable to open ");
     Serial.println(path);
@@ -139,7 +139,7 @@ void fileSelector(char* pathBuf, byte maxPathLen) {
   working();
   unsigned int fileIdx = 0;
   unsigned int maxFileIdx = filesInRoot() - 1;
-  File root = SD.open("/");
+  FsFile root = sd.open("/");
   notWorking();
   while (true) {
     working();
@@ -155,19 +155,22 @@ void fileSelector(char* pathBuf, byte maxPathLen) {
     for (unsigned int row = 0; row < maxLines - maxLines - 2; ) {
       unsigned int yPos = row * 13;
       char line[maxCharPerLine + 1];
-      File entry = root.openNextFile();
+      FsFile entry = root.openNextFile();
       if (!entry) {
         break;
       }
       if (entry.isDirectory()) {
         continue;
       }
+      char path[maxPathLen];
+      entry.getName(path, maxPathLen);
       if (row == fileIdx) {
-        snprintf(line, maxCharPerLine + 1, "> %s", entry.name());
-        strncpy(selectedPath, entry.name(), maxPathLen);
+        snprintf(line, maxCharPerLine + 1, "> %s", path);
+        strncpy(selectedPath, path, maxPathLen);
       } else {
-        snprintf(line, maxCharPerLine + 1, "  %s", entry.name());
+        snprintf(line, maxCharPerLine + 1, "  %s", path);
       }
+      entry.close();
       Serial.println(line);
       Paint_DrawString_EN(0, yPos, line, &Font12, WHITE, BLACK);
       row ++;
