@@ -30,6 +30,7 @@ unsigned int filesInRoot() {
     Serial.print("Found file: ");
     // Serial.println(entry.name());
     entry.printName(&Serial);
+    Serial.println();
     entry.close();
     fileCount ++;
   }

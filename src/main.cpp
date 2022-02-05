@@ -152,9 +152,9 @@ void fileSelector(char* pathBuf, byte maxPathLen) {
     char selectedPath[maxPathLen];
     root.rewindDirectory();
     Serial.println("Contents:");
+    char line[maxCharPerLine + 1];
     for (unsigned int row = 0; row < maxLines - maxLines - 2; ) {
       unsigned int yPos = row * 13;
-      char line[maxCharPerLine + 1];
       FsFile entry = root.openNextFile();
       if (!entry) {
         break;
@@ -163,12 +163,19 @@ void fileSelector(char* pathBuf, byte maxPathLen) {
         continue;
       }
       char path[maxPathLen];
-      entry.getName(path, maxPathLen);
+      entry.getName(path, maxPathLen - 1);
+      memset(line, 0, maxCharPerLine + 1);
       if (row == fileIdx) {
-        snprintf(line, maxCharPerLine + 1, "> %s", path);
+        strncat(line, "> ", maxCharPerLine + 1);
         strncpy(selectedPath, path, maxPathLen);
       } else {
-        snprintf(line, maxCharPerLine + 1, "  %s", path);
+        strncat(line, "  ", maxCharPerLine + 1);
+      }
+      if (2 + strlen(path) > maxCharPerLine) {
+        strncat(line, path, maxCharPerLine - 3);
+        strncat(line, "...", maxCharPerLine + 1);
+      } else {
+        strncat(line, path, maxCharPerLine + 1);
       }
       entry.close();
       Serial.println(line);

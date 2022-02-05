@@ -62,6 +62,12 @@ void drawTextReaderMenu(const char *filename, unsigned int page, unsigned int ma
   const byte bufSize = maxCharPerLine + 1;
   char fileBuf[bufSize];
   snprintf(fileBuf, bufSize, "File: %s", filename);
+  if (6 + strlen(filename) > maxCharPerLine) {
+    for (int i = 4; i > 1; i --) {
+      fileBuf[maxCharPerLine - i] = '.';
+    }
+    fileBuf[maxCharPerLine - 1] = '\0';
+  }
   char pageBuf[bufSize];
   snprintf(pageBuf, bufSize, "Page: %u / %u", page, maxPage);
   char battBuf[bufSize];
@@ -195,10 +201,16 @@ void noTextFilesScreen() {
 }
 
 void loadingTextFile(const char* filePath) {
+  char tempLine[maxCharPerLine + 1];
+  strncpy(tempLine, filePath, maxCharPerLine + 1);
   const byte linesToStickUp = 2;
+  if (strlen(tempLine) > maxCharPerLine) {
+    tempLine[maxCharPerLine - 3] = '\0';
+    strncat(tempLine, "...", maxCharPerLine + 1);
+  }
   const char *lines[linesToStickUp] = {
     "Loading text file:",
-    filePath
+    tempLine
   };
   Paint_Clear(WHITE);
   drawDialog(lines, linesToStickUp);
