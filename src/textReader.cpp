@@ -175,14 +175,33 @@ unsigned int askForPage(unsigned int curPg, unsigned int maxPg) {
 }
 
 void noSdScreen() {
-  const byte linesToStickUp = 3;
-  const char *lines[linesToStickUp] = {
-    "No SD card is inserted!",
-    "Please insert an SD card and press",
-    "any button to try again!"
-  };
   Paint_Clear(WHITE);
-  drawDialog(lines, linesToStickUp);
+  if (sd.sdErrorCode() == SD_CARD_ERROR_CMD0) {
+    const byte linesToStickUp = 4;
+    const char *lines[linesToStickUp] = {
+      "No SD card is inserted!",
+      "",
+      "Please insert an SD card and press",
+      "any button to try again!"
+    };
+    drawDialog(lines, linesToStickUp);
+  } else {
+    const byte linesToStickUp = 6;
+    const byte bufSize = maxCharPerLine + 1;
+    char errorBuf[bufSize];
+    snprintf(errorBuf, bufSize, 
+             "Error: 0x%02X, 0x%02X", 
+             sd.sdErrorCode(), sd.sdErrorData());
+    const char *lines[linesToStickUp] = {
+      "SD card error!",
+      "",
+      errorBuf,
+      "",
+      "Go to https://bit.ly/SdFatErrorCodes for",
+      "error code list"
+    };
+    drawDialog(lines, linesToStickUp);
+  }
   updateDisplay();
 }
 
