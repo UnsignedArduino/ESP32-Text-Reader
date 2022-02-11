@@ -14,7 +14,7 @@ int beginEPaper() {
     return 1;
   }
   EPD_4IN2_Init();
-  EPD_4IN2_Clear();
+  // EPD_4IN2_Clear();
   Serial.println("Successfully initalized EPaper display!");
 
   Serial.println("Preparing image buffer...");

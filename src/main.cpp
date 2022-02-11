@@ -135,19 +135,19 @@ void textReader(const char* path) {
   notWorking();
 }
 
-void fileSelector(char* pathBuf, byte maxPathLen) {
+int fileSelector(char* pathBuf, byte maxPathLen) {
   working();
-  unsigned int fileIdx = 0;
+  unsigned int optionIdx = 1;
   unsigned int maxFileIdx = filesInRoot() - 1;
   FsFile root = sd.open("/");
   notWorking();
   while (true) {
     working();
     Paint_Clear(WHITE);
-    Serial.print("Selected file: ");
-    Serial.print(fileIdx);
+    Serial.print("Selected option: ");
+    Serial.print(optionIdx);
     Serial.print("/");
-    Serial.println(maxFileIdx);
+    Serial.println(maxFileIdx + 1);
     const byte linesToStickUp = 6;
     char selectedPath[maxPathLen];
     root.rewindDirectory();
@@ -155,29 +155,41 @@ void fileSelector(char* pathBuf, byte maxPathLen) {
     char line[maxCharPerLine + 1];
     for (unsigned int row = 0; row < maxLines - linesToStickUp - 1; ) {
       unsigned int yPos = row * 13;
-      FsFile entry = root.openNextFile();
-      if (!entry) {
-        break;
-      }
-      if (entry.isDirectory()) {
-        continue;
-      }
-      char path[maxPathLen];
-      entry.getName(path, maxPathLen - 1);
       memset(line, 0, maxCharPerLine + 1);
-      if (row == fileIdx) {
-        strncat(line, "> ", maxCharPerLine + 1);
-        strncpy(selectedPath, path, maxPathLen);
+      if (row == 0) {
+        if (row == optionIdx) {
+          strncat(line, "> ", maxCharPerLine + 1);
+        } else {
+          strncat(line, "  ", maxCharPerLine + 1);
+        }
+        strncat(line, "Exit", maxPathLen);
+        Paint_DrawLine(0, yPos + 16, EPD_4IN2_HEIGHT, yPos + 16, BLACK, DOT_PIXEL_1X1, LINE_STYLE_SOLID);
+        yPos += 2;
       } else {
-        strncat(line, "  ", maxCharPerLine + 1);
+        FsFile entry = root.openNextFile();
+        if (!entry) {
+          break;
+        }
+        if (entry.isDirectory()) {
+          continue;
+        }
+        char path[maxPathLen];
+        entry.getName(path, maxPathLen - 1);
+        if (row == optionIdx) {
+          strncat(line, "> ", maxCharPerLine + 1);
+          strncpy(selectedPath, path, maxPathLen);
+        } else {
+          strncat(line, "  ", maxCharPerLine + 1);
+        }
+        if (2 + strlen(path) > maxCharPerLine) {
+          strncat(line, path, maxCharPerLine - 3);
+          strncat(line, "...", maxCharPerLine + 1);
+        } else {
+          strncat(line, path, maxCharPerLine + 1);
+        }
+        entry.close();
+        yPos += 5;
       }
-      if (2 + strlen(path) > maxCharPerLine) {
-        strncat(line, path, maxCharPerLine - 3);
-        strncat(line, "...", maxCharPerLine + 1);
-      } else {
-        strncat(line, path, maxCharPerLine + 1);
-      }
-      entry.close();
       Serial.println(line);
       Paint_DrawString_EN(0, yPos, line, &Font12, WHITE, BLACK);
       row ++;
@@ -186,7 +198,7 @@ void fileSelector(char* pathBuf, byte maxPathLen) {
     char battBuf[bufSize];
     snprintf(battBuf, bufSize, "Battery: %u%%", readPercent());
     const char *lines[linesToStickUp] = {
-      "Select a text file",
+      "Select an option",
       battBuf,
       "",
       "Left: Move up",
@@ -198,11 +210,16 @@ void fileSelector(char* pathBuf, byte maxPathLen) {
     notWorking();
     byte pressed = waitForButtonPress();
     if (pressed == CENTER_BUTTON) {
-      Serial.print("Selected path: ");
-      Serial.println(selectedPath);
-      strncpy(pathBuf, selectedPath, maxPathLen);
       root.close();
-      return;
+      if (optionIdx == 0) {
+        Serial.println("Exiting!");
+        return 1;
+      } else {
+        Serial.print("Selected path: ");
+        Serial.println(selectedPath);
+        strncpy(pathBuf, selectedPath, maxPathLen);
+        return 0;
+      }
     } else {
       unsigned long startBtnPress = millis();
       while (anyButtonPressed()) {
@@ -232,13 +249,13 @@ void fileSelector(char* pathBuf, byte maxPathLen) {
       Serial.print("Change by ");
       Serial.println(changeBy);
       if (pressed == LEFT_BUTTON) {
-        if (changeBy > fileIdx) {
-          fileIdx = 0;
+        if (changeBy > optionIdx) {
+          optionIdx = 0;
         } else {
-          fileIdx -= changeBy;
+          optionIdx -= changeBy;
         }
       } else {
-        fileIdx = min(fileIdx + changeBy, maxFileIdx);
+        optionIdx = min(optionIdx + changeBy, maxFileIdx);
       }
     }
   }
@@ -288,7 +305,10 @@ void setup() {
   while (true) {
     // char* selected_path = "/text.txt";
     char selected_path[maxPathLen];
-    fileSelector(selected_path, maxPathLen);
+    if (fileSelector(selected_path, maxPathLen) == 1) {
+      Serial.println("Exiting loop!");
+      break;
+    }
     Serial.print("Path selected: ");
     Serial.println(selected_path);
     page = 0;
