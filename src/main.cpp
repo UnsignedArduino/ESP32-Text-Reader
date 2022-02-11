@@ -148,12 +148,12 @@ void fileSelector(char* pathBuf, byte maxPathLen) {
     Serial.print(fileIdx);
     Serial.print("/");
     Serial.println(maxFileIdx);
-    const byte linesToStickUp = 5;
+    const byte linesToStickUp = 6;
     char selectedPath[maxPathLen];
     root.rewindDirectory();
     Serial.println("Contents:");
     char line[maxCharPerLine + 1];
-    for (unsigned int row = 0; row < maxLines - maxLines - 2; ) {
+    for (unsigned int row = 0; row < maxLines - linesToStickUp - 1; ) {
       unsigned int yPos = row * 13;
       FsFile entry = root.openNextFile();
       if (!entry) {
@@ -182,8 +182,12 @@ void fileSelector(char* pathBuf, byte maxPathLen) {
       Paint_DrawString_EN(0, yPos, line, &Font12, WHITE, BLACK);
       row ++;
     }
+    const byte bufSize = maxCharPerLine + 1;
+    char battBuf[bufSize];
+    snprintf(battBuf, bufSize, "Battery: %u%%", readPercent());
     const char *lines[linesToStickUp] = {
       "Select a text file",
+      battBuf,
       "",
       "Left: Move up",
       "Center: Select",
