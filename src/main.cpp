@@ -153,7 +153,7 @@ int fileSelector(char* pathBuf, byte maxPathLen) {
     root.rewindDirectory();
     Serial.println("Contents:");
     char line[maxCharPerLine + 1];
-    for (unsigned int row = 0; row < maxLines - linesToStickUp - 1; ) {
+    for (unsigned int row = 0; row < maxLines - linesToStickUp; ) {
       unsigned int yPos = row * 13;
       memset(line, 0, maxCharPerLine + 1);
       if (row == 0) {
