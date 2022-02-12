@@ -11,7 +11,11 @@ extern unsigned long bytesOnScreen;
 extern const byte maxCharPerLine;
 extern const byte maxLines;
 
-void drawScrollbar(unsigned long startFilePos, unsigned long endFilePos, unsigned long fileSize);
+void drawScrollbar(unsigned int startX, unsigned int startY, 
+                   unsigned int width, unsigned int height,
+                   unsigned long startFill, unsigned long endFill, unsigned long maximum);
+
+void drawTextReaderScrollbar(unsigned long startFilePos, unsigned long endFilePos, unsigned long fileSize);
 
 void drawDialog(const char* lines[], byte lineCount);
 
