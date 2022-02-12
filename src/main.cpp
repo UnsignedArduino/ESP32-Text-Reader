@@ -139,6 +139,9 @@ int fileSelector(char* pathBuf, byte maxPathLen) {
   working();
   unsigned int optionIdx = 1;
   unsigned int maxFileIdx = filesInRoot() - 1;
+  unsigned int maxOptionIdx = maxFileIdx + 1;
+  unsigned int optionSkip = 0;
+  const unsigned int maxOptionPage = 24;
   FsFile root = sd.open("/");
   notWorking();
   while (true) {
@@ -147,24 +150,35 @@ int fileSelector(char* pathBuf, byte maxPathLen) {
     Serial.print("Selected option: ");
     Serial.print(optionIdx);
     Serial.print("/");
-    Serial.println(maxFileIdx + 1);
+    Serial.println(maxOptionIdx);
+    if (optionIdx > maxOptionPage - 1) {
+      optionSkip = (optionIdx / maxOptionPage) * maxOptionPage;
+    } else {
+      optionSkip = 0;
+    }
+    Serial.print("Skipping ");
+    Serial.print(optionSkip);
+    Serial.println(" options");
     const byte linesToStickUp = 6;
     char selectedPath[maxPathLen];
     root.rewindDirectory();
     Serial.println("Contents:");
     char line[maxCharPerLine + 1];
-    for (unsigned int row = 0; row < maxLines - linesToStickUp; ) {
-      unsigned int yPos = row * 13;
+    const unsigned int maxRow = maxLines - linesToStickUp + optionSkip;
+    for (unsigned int row = 0; row < maxRow; ) {
+      unsigned int yPos = (row - optionSkip) * 13;
       memset(line, 0, maxCharPerLine + 1);
       if (row == 0) {
-        if (row == optionIdx) {
-          strncat(line, "> ", maxCharPerLine + 1);
-        } else {
-          strncat(line, "  ", maxCharPerLine + 1);
+        if (row >= optionSkip) {
+          if (row == optionIdx) {
+            strncat(line, "> ", maxCharPerLine + 1);
+          } else {
+            strncat(line, "  ", maxCharPerLine + 1);
+          }
+          strncat(line, "Exit", maxPathLen);
+          Paint_DrawLine(0, yPos + 16, EPD_4IN2_HEIGHT, yPos + 16, BLACK, DOT_PIXEL_1X1, LINE_STYLE_SOLID);
+          yPos += 2;
         }
-        strncat(line, "Exit", maxPathLen);
-        Paint_DrawLine(0, yPos + 16, EPD_4IN2_HEIGHT, yPos + 16, BLACK, DOT_PIXEL_1X1, LINE_STYLE_SOLID);
-        yPos += 2;
       } else {
         FsFile entry = root.openNextFile();
         if (!entry) {
@@ -190,10 +204,14 @@ int fileSelector(char* pathBuf, byte maxPathLen) {
         entry.close();
         yPos += 5;
       }
-      Serial.println(line);
-      Paint_DrawString_EN(0, yPos, line, &Font12, WHITE, BLACK);
+      if (row >= optionSkip) {  
+        Serial.println(line);
+        Paint_DrawString_EN(0, yPos, line, &Font12, WHITE, BLACK);
+      }
       row ++;
     }
+    drawScrollbar(EPD_4IN2_HEIGHT - 3, 1, 3, EPD_4IN2_WIDTH - (13 * linesToStickUp), 
+                  optionSkip, min(optionSkip + maxOptionPage, maxOptionIdx), maxOptionIdx);
     const byte bufSize = maxCharPerLine + 1;
     char battBuf[bufSize];
     snprintf(battBuf, bufSize, "Battery: %u%%", readPercent());
@@ -224,7 +242,9 @@ int fileSelector(char* pathBuf, byte maxPathLen) {
       unsigned long startBtnPress = millis();
       while (anyButtonPressed()) {
         unsigned long blinkDelay;
-        if (millis() - startBtnPress > 6000) {
+        if (millis() - startBtnPress > 9000) {
+          blinkDelay = 25;
+        } else if (millis() - startBtnPress > 6000) {
           blinkDelay = 50;
         } else if (millis() - startBtnPress > 3000) {
           blinkDelay = 100;
@@ -239,7 +259,9 @@ int fileSelector(char* pathBuf, byte maxPathLen) {
       unsigned long endBtnPress = millis();
       unsigned long btnDiff = endBtnPress - startBtnPress;
       unsigned int changeBy;
-      if (btnDiff > 6000) {
+      if (btnDiff > 9000) {
+        changeBy = 20;
+      } else if (btnDiff > 6000) {
         changeBy = 10;
       } else if (btnDiff > 3000) {
         changeBy = 5;
@@ -255,7 +277,7 @@ int fileSelector(char* pathBuf, byte maxPathLen) {
           optionIdx -= changeBy;
         }
       } else {
-        optionIdx = min(optionIdx + changeBy, maxFileIdx);
+        optionIdx = min(optionIdx + changeBy, maxOptionIdx);
       }
     }
   }

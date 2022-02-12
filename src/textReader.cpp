@@ -52,7 +52,7 @@ void drawScrollbar(unsigned int startX, unsigned int startY,
 }
 
 void drawTextReaderScrollbar(unsigned long startFilePos, unsigned long endFilePos, unsigned long fileSize) {
-  drawScrollbar(EPD_4IN2_HEIGHT - 4, 1, 3, EPD_4IN2_WIDTH - 2, startFilePos, endFilePos, fileSize);
+  drawScrollbar(EPD_4IN2_HEIGHT - 3, 1, 3, EPD_4IN2_WIDTH - 2, startFilePos, endFilePos, fileSize);
 }
 
 void drawDialog(const char* lines[], byte lineCount) {
