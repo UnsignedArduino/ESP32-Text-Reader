@@ -34,9 +34,13 @@ void textReader(const char* path) {
   Serial.println("Finding max page");
   loadingTextFile(path);
 
-  maxPage = getMaxPage(maxLines);
+  unsigned long crc;
+  maxPage = getMaxPage(maxLines, crc);
   Serial.print("Max page: ");
   Serial.println(maxPage);
+
+  Serial.print("CRC32: 0x");
+  Serial.println(crc, HEX);
 
   Serial.println("First text print");
   filePos = 0;

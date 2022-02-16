@@ -33,4 +33,4 @@ unsigned long printFromLocation(unsigned int rows);
 
 unsigned long getPosFromPage(unsigned int page, unsigned int rows);
 
-unsigned int getMaxPage(unsigned int rows);
+unsigned int getMaxPage(unsigned int rows, unsigned long& crc);

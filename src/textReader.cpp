@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <SdFat.h>
+#include <CRC32.h>
 #include "utils.h"
 #include "sdUtils.h"
 #include "buttonUtils.h"
@@ -330,8 +331,10 @@ unsigned long getPosFromPage(unsigned int page, unsigned int rows) {
   return endFilePos;
 }
 
-unsigned int getMaxPage(unsigned int rows) {
+unsigned int getMaxPage(unsigned int rows, unsigned long& crc) {
   Serial.println("Finding max page");
+  unsigned long startTime = millis();
+  CRC32 crc32;
   unsigned int page = 0;
   file.seek(0);
   while (true) {
@@ -341,9 +344,24 @@ unsigned int getMaxPage(unsigned int rows) {
         if (nextByte == -1) {
           Serial.print("Last page is ");
           Serial.println(page);
+          crc = crc32.finalize();
+          Serial.print("CRC32 is 0x");
+          Serial.println(crc, HEX);
+          unsigned long endTime = millis();
+          float elapsedTime = (endTime - startTime) / 1000.0;
+          Serial.print("Took ");
+          Serial.print(elapsedTime);
+          Serial.print("s to parse ");
+          float fileSize = file.size() / 1024.0;
+          Serial.print(fileSize);
+          Serial.print(" kB (average ");
+          float parseSpeed = fileSize / elapsedTime;
+          Serial.print(parseSpeed);
+          Serial.println(" kB/sec)");
           return page;
         }
         char ch = (char)nextByte;
+        crc32.update((byte)nextByte);
         if (ch == '\n') { // \n
           break;
         } else if (ch == '\r') {  // \r\n
