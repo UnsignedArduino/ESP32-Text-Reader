@@ -1,1 +1,2 @@
 // #define SET_PAGE_VIA_SERIAL
+#define PROFILE_GET_MAX_PAGE

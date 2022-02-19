@@ -8,6 +8,7 @@
 #include "battUtils.h"
 #include "textReader.h"
 #include "config.h"
+#include "profiling.h"
 
 unsigned int page = 0;
 unsigned int maxPage = 0;
@@ -295,6 +296,11 @@ void setup() {
   Serial.println();
   #if defined(SET_PAGE_VIA_SERIAL)
   Serial.println("Setting page via serial is enabled!");
+  #endif
+  #if defined(PROFILING)
+  Serial.println("Enabling profiling");
+  prepareProfiling();
+  Serial.println("Profiling enabled!");
   #endif
 
   beginButtons();

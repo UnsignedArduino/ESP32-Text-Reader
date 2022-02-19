@@ -8,6 +8,8 @@
 #include "epaperUtils.h"
 #include <GUI_Paint.h>
 #include "textReader.h"
+#include "config.h"
+#include "profiling.h"
 
 FsFile file;
 unsigned long filePos = 0;
@@ -337,11 +339,23 @@ unsigned int getMaxPage(unsigned int rows, unsigned long& crc) {
   CRC32 crc32;
   unsigned int page = 0;
   file.seek(0);
+  #if defined(PROFILE_GET_MAX_PAGE)
+  startProfiling();
+  #endif
   while (true) {
     for (unsigned int row = 0; row < rows; row ++) {
       for (byte i = 0; i < maxCharPerLine; i ++) {
+        #if defined(PROFILE_GET_MAX_PAGE)
+        startSection(FILE_READ_NEXTBYTE);
+        #endif
         int nextByte = file.read();
+        #if defined(PROFILE_GET_MAX_PAGE)
+        endSection(FILE_READ_NEXTBYTE);
+        #endif
         if (nextByte == -1) {
+          #if defined(PROFILE_GET_MAX_PAGE)
+          endProfiling();
+          #endif
           Serial.print("Last page is ");
           Serial.println(page);
           crc = crc32.finalize();
@@ -361,20 +375,38 @@ unsigned int getMaxPage(unsigned int rows, unsigned long& crc) {
           return page;
         }
         char ch = (char)nextByte;
+        #if defined(PROFILE_GET_MAX_PAGE)
+        startSection(CRC32_UPDATE);
+        #endif
         crc32.update((byte)nextByte);
+        #if defined(PROFILE_GET_MAX_PAGE)
+        endSection(CRC32_UPDATE);
+        #endif
         if (ch == '\n') { // \n
           break;
         } else if (ch == '\r') {  // \r\n
+          #if defined(PROFILE_GET_MAX_PAGE)
+          startSection(FILE_READ_SLASH_N);
+          #endif
           file.read();  // Advance forward one more because we still have \n to consume
+          #if defined(PROFILE_GET_MAX_PAGE)
+          endSection(FILE_READ_SLASH_N);
+          #endif
           break;
         }
       }
     }
     page ++;
     if (page % 10 == 0) {
+      #if defined(PROFILE_GET_MAX_PAGE)
+      startSection(SERIAL_PRINT);
+      #endif
       Serial.print("On page ");
       Serial.print(page);
       Serial.println(" and still counting");
+      #if defined(PROFILE_GET_MAX_PAGE)
+      endSection(SERIAL_PRINT);
+      #endif
     }
   }
 }
