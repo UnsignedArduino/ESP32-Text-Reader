@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include "profiling.h"
 
+#if defined(PROFILING)
+
 hw_timer_t* timer = NULL;
 portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 
@@ -98,3 +100,5 @@ void endProfiling() {
     Serial.println("%)");
   }
 }
+
+#endif
