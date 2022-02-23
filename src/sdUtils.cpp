@@ -16,8 +16,8 @@ int beginSD() {
   return 0;
 }
 
-unsigned int filesInRoot() {
-  unsigned int fileCount = 0;
+unsigned long filesInRoot() {
+  unsigned long fileCount = 0;
   FsFile root = sd.open("/");
   while (true) {
     FsFile entry = root.openNextFile();

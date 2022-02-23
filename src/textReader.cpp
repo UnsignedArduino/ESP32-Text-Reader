@@ -74,7 +74,7 @@ void drawDialog(const char* lines[], byte lineCount) {
   }
 }
 
-void drawTextReaderMenu(const char *filename, unsigned int page, unsigned int maxPage) {
+void drawTextReaderMenu(const char *filename, unsigned long page, unsigned long maxPage) {
   const byte linesToStickUp = 7;
   Serial.println("Drawing text reader menu");
   const byte bufSize = maxCharPerLine + 1;
@@ -103,9 +103,9 @@ void drawTextReaderMenu(const char *filename, unsigned int page, unsigned int ma
   drawDialog(lines, linesToStickUp);
 }
 
-unsigned int askForPage(unsigned int curPg, unsigned int maxPg) {
+unsigned long askForPage(unsigned long curPg, unsigned long maxPg) {
   working();
-  unsigned int value = curPg;
+  unsigned long value = curPg;
   Serial.println("Drawing page selector menu");
   notWorking();
   bool update = true;
@@ -305,7 +305,7 @@ unsigned long long printFromLocation(unsigned int rows) {
   return file.position();
 }
 
-unsigned long long getPosFromPage(unsigned int page, unsigned int rows) {
+unsigned long long getPosFromPage(unsigned long page, unsigned int rows) {
   file.seek(0);
   for (int p = 0; p < page; p ++) {
     for (unsigned int row = 0; row < rows; row ++) {
@@ -333,11 +333,11 @@ unsigned long long getPosFromPage(unsigned int page, unsigned int rows) {
   return endFilePos;
 }
 
-unsigned int getMaxPage(unsigned int rows, unsigned long& crc) {
+unsigned long getMaxPage(unsigned int rows, unsigned long& crc) {
   Serial.println("Finding max page");
   unsigned long startTime = millis();
   CRC32 crc32;
-  unsigned int page = 0;
+  unsigned long page = 0;
   file.seek(0);
   #if defined(PROFILE_GET_MAX_PAGE)
   startProfiling();

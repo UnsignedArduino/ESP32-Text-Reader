@@ -10,8 +10,8 @@
 #include "config.h"
 #include "profiling.h"
 
-unsigned int page = 0;
-unsigned int maxPage = 0;
+unsigned long page = 0;
+unsigned long maxPage = 0;
 
 void textReader(const char* path) {
   working();
@@ -140,11 +140,11 @@ void textReader(const char* path) {
 
 int fileSelector(char* pathBuf, byte maxPathLen) {
   working();
-  unsigned int optionIdx = 1;
-  unsigned int maxFileIdx = filesInRoot() - 1;
-  unsigned int maxOptionIdx = maxFileIdx + 1;
-  unsigned int optionSkip = 0;
-  const unsigned int maxOptionPage = 24;
+  unsigned long optionIdx = 1;
+  unsigned long maxFileIdx = filesInRoot() - 1;
+  unsigned long maxOptionIdx = maxFileIdx + 1;
+  unsigned long optionSkip = 0;
+  const unsigned long maxOptionPage = 24;
   FsFile root = sd.open("/");
   notWorking();
   while (true) {

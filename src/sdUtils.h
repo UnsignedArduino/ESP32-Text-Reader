@@ -13,7 +13,7 @@ extern SdFs sd;
 
 int beginSD();
 
-unsigned int filesInRoot();
+unsigned long filesInRoot();
 
 bool seekRelative(FsFile f, long difference);
 

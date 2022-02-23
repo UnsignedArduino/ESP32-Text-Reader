@@ -19,9 +19,9 @@ void drawTextReaderScrollbar(unsigned long long startFilePos, unsigned long long
 
 void drawDialog(const char* lines[], byte lineCount);
 
-void drawTextReaderMenu(const char* filename, unsigned int page, unsigned int maxPage);
+void drawTextReaderMenu(const char* filename, unsigned long page, unsigned long maxPage);
 
-unsigned int askForPage(unsigned int curPg, unsigned int maxPg);
+unsigned long askForPage(unsigned long curPg, unsigned long maxPg);
 
 void noSdScreen();
 
@@ -31,6 +31,6 @@ void loadingTextFile(const char* filePath);
 
 unsigned long long printFromLocation(unsigned int rows);
 
-unsigned long long getPosFromPage(unsigned int page, unsigned int rows);
+unsigned long long getPosFromPage(unsigned long page, unsigned int rows);
 
-unsigned int getMaxPage(unsigned int rows, unsigned long& crc);
+unsigned long getMaxPage(unsigned int rows, unsigned long& crc);
