@@ -87,7 +87,7 @@ void drawTextReaderMenu(const char *filename, unsigned long page, unsigned long 
     fileBuf[maxCharPerLine - 1] = '\0';
   }
   char pageBuf[bufSize];
-  snprintf(pageBuf, bufSize, "Page: %u / %u", page, maxPage);
+  snprintf(pageBuf, bufSize, "Page: %lu / %lu", page, maxPage);
   char battBuf[bufSize];
   // snprintf(battBuf, bufSize, "Battery: %#.2Fv", (float)readBatt() / 1000.0);
   snprintf(battBuf, bufSize, "Battery: %u%%", readPercent());
@@ -119,9 +119,9 @@ unsigned long askForPage(unsigned long curPg, unsigned long maxPg) {
       const byte linesToStickUp = 9;
       const unsigned int bufSize = maxCharPerLine + 1;
       char curPageBuf[bufSize];
-      snprintf(curPageBuf, bufSize, "Current page: %u / %u", curPg + 1, maxPg + 1);
+      snprintf(curPageBuf, bufSize, "Current page: %lu / %lu", curPg + 1, maxPg + 1);
       char goPageBuf[bufSize];
-      snprintf(goPageBuf, bufSize, "Go to page: %u", value + 1);
+      snprintf(goPageBuf, bufSize, "Go to page: %lu", value + 1);
       const char *lines[linesToStickUp] = {
         "What page would you like to go to?",
         "",

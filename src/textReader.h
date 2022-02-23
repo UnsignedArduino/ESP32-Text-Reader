@@ -13,7 +13,7 @@ extern const byte maxLines;
 
 void drawScrollbar(unsigned int startX, unsigned int startY, 
                    unsigned int width, unsigned int height,
-                   unsigned long long startFill, unsigned long long endFill, unsigned long long maximum);
+                   unsigned long startFill, unsigned long endFill, unsigned long maximum);
 
 void drawTextReaderScrollbar(unsigned long long startFilePos, unsigned long long endFilePos, unsigned long long fileSize);
 
