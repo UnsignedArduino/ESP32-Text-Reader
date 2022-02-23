@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include <SdFat.h>
 
+#define MAX_PATH_LEN 255
+
 #define SD_FAT_TYPE 3
 #define SPI_CLOCK SD_SCK_MHZ(10)
 #define SD_CONFIG SdSpiConfig(sdCS, SHARED_SPI, SPI_CLOCK)

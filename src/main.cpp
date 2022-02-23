@@ -13,8 +13,6 @@
 unsigned int page = 0;
 unsigned int maxPage = 0;
 
-const byte maxPathLen = 255;
-
 void textReader(const char* path) {
   working();
 
@@ -336,8 +334,8 @@ void setup() {
 
   while (true) {
     // char* selected_path = "/text.txt";
-    char selected_path[maxPathLen];
-    if (fileSelector(selected_path, maxPathLen) == 1) {
+    char selected_path[MAX_PATH_LEN];
+    if (fileSelector(selected_path, MAX_PATH_LEN) == 1) {
       Serial.println("Exiting loop!");
       break;
     }

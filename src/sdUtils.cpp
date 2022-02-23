@@ -61,7 +61,7 @@ int peekBefore(FsFile f) {
 }
 
 int peekAtRelative(FsFile f, long difference) {
-  unsigned long position = f.position();
+  unsigned long long position = f.position();
   if (!seekRelative(f, difference)) {
     return -1;
   }

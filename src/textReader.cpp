@@ -12,10 +12,10 @@
 #include "profiling.h"
 
 FsFile file;
-unsigned long filePos = 0;
-unsigned long nextFilePos = 0;
+unsigned long long filePos = 0;
+unsigned long long nextFilePos = 0;
 
-unsigned long fileSize = 0;
+unsigned long long fileSize = 0;
 unsigned long bytesOnScreen = 0;
 
 const byte maxCharPerLine = 40;
@@ -54,7 +54,7 @@ void drawScrollbar(unsigned int startX, unsigned int startY,
                       BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
 }
 
-void drawTextReaderScrollbar(unsigned long startFilePos, unsigned long endFilePos, unsigned long fileSize) {
+void drawTextReaderScrollbar(unsigned long long startFilePos, unsigned long long endFilePos, unsigned long long fileSize) {
   drawScrollbar(EPD_4IN2_HEIGHT - 3, 1, 3, EPD_4IN2_WIDTH - 2, startFilePos, endFilePos, fileSize);
 }
 
@@ -254,10 +254,10 @@ void loadingTextFile(const char* filePath) {
   updateDisplay();
 }
 
-unsigned long printFromLocation(unsigned int rows) {
+unsigned long long printFromLocation(unsigned int rows) {
   Paint_Clear(WHITE);
 
-  unsigned long startFilePos = file.position();
+  unsigned long long startFilePos = file.position();
 
   Serial.print("Reading from location ");
   Serial.println(startFilePos);
@@ -292,7 +292,7 @@ unsigned long printFromLocation(unsigned int rows) {
     Paint_DrawString_EN(0, yPos, line, &Font12, WHITE, BLACK);
   }
 
-  unsigned long endFilePos = file.position();
+  unsigned long long endFilePos = file.position();
 
   Serial.print("Ended at position: "); 
   Serial.println(endFilePos);
@@ -305,7 +305,7 @@ unsigned long printFromLocation(unsigned int rows) {
   return file.position();
 }
 
-unsigned long getPosFromPage(unsigned int page, unsigned int rows) {
+unsigned long long getPosFromPage(unsigned int page, unsigned int rows) {
   file.seek(0);
   for (int p = 0; p < page; p ++) {
     for (unsigned int row = 0; row < rows; row ++) {
@@ -325,7 +325,7 @@ unsigned long getPosFromPage(unsigned int page, unsigned int rows) {
     }
   }
 
-  unsigned long endFilePos = file.position();
+  unsigned long long endFilePos = file.position();
 
   Serial.print("Ended at position: "); 
   Serial.println(endFilePos);
