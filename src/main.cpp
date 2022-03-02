@@ -2,6 +2,7 @@
 #include <SdFat.h>
 #include "utils.h"
 #include "sdUtils.h"
+#include "bookmark.h"
 #include "epaperUtils.h"
 #include <GUI_Paint.h>
 #include "buttonUtils.h"
@@ -40,6 +41,9 @@ void textReader(const char* path) {
 
   Serial.print("CRC32: 0x");
   Serial.println(crc, HEX);
+
+  unsigned long lastPage = 0;
+  getLastPage(path, fileSize, crc, lastPage);
 
   Serial.println("First text print");
   filePos = 0;
@@ -99,6 +103,7 @@ void textReader(const char* path) {
       byte pressed = waitForButtonPress();
       if (pressed == LEFT_BUTTON) {
         Serial.println("Left button pressed, exiting!");
+        setLastPage(path, fileSize, crc, page);
         break;
       } else if (pressed == RIGHT_BUTTON) {
         working();
