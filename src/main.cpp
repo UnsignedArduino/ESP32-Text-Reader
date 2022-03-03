@@ -42,13 +42,54 @@ void textReader(const char* path) {
   Serial.print("CRC32: 0x");
   Serial.println(crc, HEX);
 
-  unsigned long lastPage = 0;
-  getLastPage(path, fileSize, crc, lastPage);
-
   Serial.println("First text print");
   filePos = 0;
   file.seek(filePos);
   nextFilePos = printFromLocation(maxLines);
+
+  unsigned long lastPage = 0;
+  
+  if (getLastPage(path, fileSize, crc, lastPage) && lastPage > 0) {
+    working();
+    Serial.print("Found last page set to ");
+    Serial.println(lastPage);
+    const byte linesToStickUp = 6;
+    const byte bufSize = maxCharPerLine + 1;
+    char lastPageBuf[bufSize];
+    snprintf(lastPageBuf, bufSize, "Your were last on page %lu", lastPage + 1);
+    const char* lines[linesToStickUp] = {
+      lastPageBuf,
+      "",
+      "Do you want to go there?",
+      "",
+      "Left: No",
+      "Right: Yes"
+    };
+    drawDialog(lines, linesToStickUp);
+    updateDisplay();
+    notWorking();
+    byte pressed;
+    while (true) {
+      pressed = waitForButtonPress();
+      if (pressed == CENTER_BUTTON) {
+        continue;
+      }
+      break;
+    }
+    if (pressed == RIGHT_BUTTON) {
+      Serial.println("Going to last page");
+      filePos = getPosFromPage(lastPage, maxLines);
+    } else {
+      Serial.println("Going to first page");
+      filePos = 0;
+    }
+
+    file.seek(filePos);
+    nextFilePos = printFromLocation(maxLines);
+  }
+
+  working();
+
   updateDisplay();
 
   notWorking();
