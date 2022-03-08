@@ -4,6 +4,7 @@
 #include "sdUtils.h"
 #include "bookmark.h"
 #include "epaperUtils.h"
+#include "screensaver.h"
 #include <GUI_Paint.h>
 #include "buttonUtils.h"
 #include "battUtils.h"
@@ -19,7 +20,7 @@ void textReader(const char* path) {
 
   Serial.print("Opening ");
   Serial.println(path);
-  file = sd.open(path, FILE_READ);
+  file = sd.open(path, O_READ);
   if (!file) {
     Serial.print("Unable to open ");
     Serial.println(path);
@@ -346,6 +347,12 @@ void setup() {
   prepareProfiling();
   Serial.println("Profiling enabled!");
   #endif
+  #if defined(ENABLE_SCREENSAVERS)
+  Serial.println("Screensavers are enabled!");
+  #endif
+  #if defined(SKIP_TO_SCREENSAVERS)
+  Serial.println("Skipping directly to screensaver code after initalization");
+  #endif
 
   beginButtons();
 
@@ -378,6 +385,7 @@ void setup() {
 
   notWorking();
 
+  #if !defined(SKIP_TO_SCREENSAVERS)
   while (true) {
     // char* selected_path = "/text.txt";
     char selected_path[MAX_PATH_LEN];
@@ -390,9 +398,24 @@ void setup() {
     page = 0;
     textReader(selected_path);
   }
+  #else
+  Serial.println("Skipping text reader code, going to screensaver!");
+  #endif
 
   working();
   Paint_Clear(WHITE);
+  #if defined(ENABLE_SCREENSAVERS)
+  if (drawScreensaver()) {
+    Serial.println("Successfully drawn random screensaver!");
+  } else {
+    Serial.println("Failed to draw random screensaver!");
+    Paint_Clear(WHITE);
+  }
+  if (anyButtonPressed()) {
+    Serial.println("Skipping screensaver!");
+    Paint_Clear(WHITE);
+  }
+  #endif
   updateDisplay();
   EPD_4IN2_Sleep();
   notWorking();

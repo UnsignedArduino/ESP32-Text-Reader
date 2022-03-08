@@ -13,7 +13,15 @@ extern SdFs sd;
 
 int beginSD();
 
+bool fileAtIndex(const char* path, const char* ext, unsigned long index, char* result, byte size);
+
+unsigned long filesInDir(const char* path, const char* ext);
+
+unsigned long filesInDir(const char* path);
+
 unsigned long filesInRoot();
+
+bool pickRandomFilename(const char* path, const char* ext, char* result, byte size);
 
 bool seekRelative(FsFile f, long difference);
 
