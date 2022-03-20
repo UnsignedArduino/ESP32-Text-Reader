@@ -102,15 +102,15 @@ int jpegDraw(JPEGDRAW* draw) {
 
 bool drawScreensaver() {
   Serial.println("Attempting to draw screensaver");
-  unsigned long screensaverCount = filesInDir(SCREENSAVERS_PATH, IMAGE_EXT);
-  if (screensaverCount == 0) {
-    Serial.println("Could not find any screensavers!");
-    return false;
-  } else {
-    Serial.print("Found ");
-    Serial.print(screensaverCount);
-    Serial.println(" screensavers");
-  }
+  // unsigned long screensaverCount = filesInDir(SCREENSAVERS_PATH, IMAGE_EXT);
+  // if (screensaverCount == 0) {
+  //   Serial.println("Could not find any screensavers!");
+  //   return false;
+  // } else {
+  //   Serial.print("Found ");
+  //   Serial.print(screensaverCount);
+  //   Serial.println(" screensavers");
+  // }
   char tempPath[MAX_PATH_LEN] = {};
   if (!pickRandomFilename(SCREENSAVERS_PATH, IMAGE_EXT, tempPath, MAX_PATH_LEN)) {
     Serial.println("Failed to pick random filename!");

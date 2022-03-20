@@ -139,6 +139,7 @@ unsigned long filesInDir(const char* path) {
       Serial.print("Skip directory: ");
       entry.printName(&Serial);
       entry.close();
+      Serial.println();
       continue;
     }
     Serial.print("Found file: ");

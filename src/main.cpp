@@ -1,3 +1,12 @@
+// .pio\libdeps\esp32doit-devkit-v1\SdFat\src\SdFatConfig.h
+#define SD_FAT_TYPE 3
+#define USE_FAT_FILE_FLAG_CONTIGUOUS 1
+#define SPI_DRIVER_SELECT 1
+#define USE_SPI_ARRAY_TRANSFER 1
+#define USE_SEPARATE_FAT_CACHE 1
+#define USE_EXFAT_BITMAP_CACHE 1
+#define USE_MULTI_SECTOR_IO 1
+
 #include <Arduino.h>
 #include <SdFat.h>
 #include "utils.h"
