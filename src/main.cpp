@@ -63,39 +63,44 @@ void textReader(const char* path) {
     working();
     Serial.print("Found last page set to ");
     Serial.println(lastPage);
-    const byte linesToStickUp = 6;
+    const byte linesToStickUp = 7;
     const byte bufSize = maxCharPerLine + 1;
     char lastPageBuf[bufSize];
-    snprintf(lastPageBuf, bufSize, "Your were last on page %lu", lastPage + 1);
+    snprintf(lastPageBuf, bufSize, "Your were last on page %lu.", lastPage + 1);
     const char* lines[linesToStickUp] = {
       lastPageBuf,
       "",
       "Do you want to go there?",
       "",
       "Left: No",
+      "Middle: Cancel",
       "Right: Yes"
     };
     drawDialog(lines, linesToStickUp);
     updateDisplay();
     notWorking();
-    byte pressed;
-    while (true) {
-      pressed = waitForButtonPress();
-      if (pressed == CENTER_BUTTON) {
-        continue;
-      }
-      break;
-    }
+    byte pressed = waitForButtonPress();
+    working();
     if (pressed == RIGHT_BUTTON) {
       Serial.println("Going to last page");
       filePos = getPosFromPage(lastPage, maxLines);
+      page = lastPage;
+    } else if (pressed == CENTER_BUTTON) {
+      Serial.println("Cancel!");
+      Serial.println("Closing file");
+      file.close();
+      notWorking();
+      return;
     } else {
       Serial.println("Going to first page");
       filePos = 0;
+      page = 0;
     }
 
     file.seek(filePos);
     nextFilePos = printFromLocation(maxLines);
+  } else {
+    page = 0;
   }
 
   working();
@@ -404,7 +409,6 @@ void setup() {
     }
     Serial.print("Path selected: ");
     Serial.println(selected_path);
-    page = 0;
     textReader(selected_path);
   }
   #else
